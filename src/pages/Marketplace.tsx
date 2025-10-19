@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
@@ -13,9 +13,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Search, SlidersHorizontal, MapPin, Star } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Marketplace = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 1200);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Mock data - will be replaced with real data
   const mockAds = [
@@ -148,7 +155,26 @@ const Marketplace = () => {
 
         {/* Ads Grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mockAds.map((ad, index) => (
+          {loading ? (
+            Array.from({ length: 6 }).map((_, i) => (
+              <Card key={i} className="overflow-hidden">
+                <Skeleton className="w-full aspect-video" />
+                <div className="p-4 space-y-3">
+                  <div className="flex justify-between items-start">
+                    <Skeleton className="h-5 w-20" />
+                    <Skeleton className="h-7 w-16" />
+                  </div>
+                  <Skeleton className="h-6 w-full" />
+                  <Skeleton className="h-4 w-3/4" />
+                  <div className="flex justify-between items-center pt-3">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-4 w-16" />
+                  </div>
+                </div>
+              </Card>
+            ))
+          ) : (
+            mockAds.map((ad, index) => (
             <Link key={ad.id} to={`/ad/${ad.id}`}>
               <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 h-full animate-fade-in" style={{ animationDelay: `${index * 0.05}s` }}>
                 <div className="aspect-video overflow-hidden">
@@ -187,7 +213,8 @@ const Marketplace = () => {
                 </div>
               </Card>
             </Link>
-          ))}
+            ))
+          )}
         </div>
 
         {/* Load More */}
