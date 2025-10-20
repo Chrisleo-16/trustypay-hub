@@ -9,12 +9,19 @@ import {
   BarChart3,
   Settings,
   LogOut,
-  TrendingUp,
-  TrendingDown,
-  DollarSign,
   Activity,
-  Package,
   Menu,
+  ChevronDown,
+  ChevronRight,
+  UserCheck,
+  Mail,
+  Smartphone,
+  RefreshCcw,
+  Coins,
+  Bitcoin,
+  Clock,
+  CheckCircle2,
+  FileText,
 } from "lucide-react";
 import {
   SidebarProvider,
@@ -31,22 +38,35 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 const menuItems = [
   { title: "Dashboard", icon: LayoutDashboard, url: "/admin" },
-  { title: "Ads", icon: ShoppingBag, url: "/admin/ads" },
+  {
+    title: "Manage Order",
+    icon: ShoppingBag,
+    url: "/admin/orders",
+    subItems: [
+      { title: "All Orders", url: "/admin/orders/all" },
+      { title: "Pending Orders", url: "/admin/orders/pending" },
+      { title: "Completed Orders", url: "/admin/orders/completed" },
+    ],
+  },
+  {
+    title: "Manage P2P",
+    icon: Users,
+    url: "/admin/p2p",
+    subItems: [
+      { title: "Running Trade", url: "/admin/p2p/running" },
+      { title: "Reported Trade", url: "/admin/p2p/reported" },
+      { title: "Completed Trade", url: "/admin/p2p/completed" },
+      { title: "Manage Ad", url: "/admin/p2p/ads" },
+      { title: "Payment Window", url: "/admin/p2p/payment-window" },
+      { title: "Payment Method", url: "/admin/p2p/payment-method" },
+    ],
+  },
   { title: "Transactions", icon: CreditCard, url: "/admin/transactions" },
-  { title: "Users", icon: Users, url: "/admin/users" },
   { title: "Disputes", icon: AlertCircle, url: "/admin/disputes" },
   { title: "Reports", icon: BarChart3, url: "/admin/reports" },
   { title: "Settings", icon: Settings, url: "/admin/settings" },
@@ -54,103 +74,105 @@ const menuItems = [
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("Dashboard");
+  const [openMenus, setOpenMenus] = useState<string[]>(["Manage P2P"]);
 
-  const stats = [
-    {
-      title: "Total Revenue",
-      value: "$127,458",
-      change: "+12.5%",
-      trend: "up",
-      icon: DollarSign,
-      color: "text-success",
-      bgColor: "bg-success/10",
-    },
-    {
-      title: "Active Ads",
-      value: "2,847",
-      change: "+8.2%",
-      trend: "up",
-      icon: Package,
-      color: "text-accent",
-      bgColor: "bg-accent/10",
-    },
+  const toggleMenu = (title: string) => {
+    setOpenMenus((prev) =>
+      prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title]
+    );
+  };
+
+  const mainStats = [
     {
       title: "Total Users",
-      value: "12,456",
-      change: "+15.3%",
-      trend: "up",
+      value: "2,756",
       icon: Users,
       color: "text-primary",
       bgColor: "bg-primary/10",
     },
     {
-      title: "Pending Disputes",
-      value: "23",
-      change: "-5.1%",
-      trend: "down",
-      icon: AlertCircle,
+      title: "Active Users",
+      value: "2,473",
+      icon: UserCheck,
+      color: "text-success",
+      bgColor: "bg-success/10",
+    },
+    {
+      title: "Email Unverified Users",
+      value: "244",
+      icon: Mail,
       color: "text-warning",
       bgColor: "bg-warning/10",
     },
-  ];
-
-  const recentTransactions = [
     {
-      id: "TXN-001",
-      user: "john.doe@email.com",
-      crypto: "Bitcoin",
-      amount: "$43,250",
-      status: "completed",
-      date: "2025-01-15",
+      title: "Mobile Unverified Users",
+      value: "0",
+      icon: Smartphone,
+      color: "text-danger",
+      bgColor: "bg-danger/10",
     },
     {
-      id: "TXN-002",
-      user: "jane.smith@email.com",
-      crypto: "Ethereum",
-      amount: "$2,280",
-      status: "escrow",
-      date: "2025-01-15",
+      title: "Total Trade",
+      value: "5,162",
+      icon: RefreshCcw,
+      color: "text-accent",
+      bgColor: "bg-accent/10",
     },
     {
-      id: "TXN-003",
-      user: "mike.wilson@email.com",
-      crypto: "Solana",
-      amount: "$1,969",
-      status: "pending",
-      date: "2025-01-14",
+      title: "Total Currencies",
+      value: "44",
+      icon: Coins,
+      color: "text-primary",
+      bgColor: "bg-primary/10",
     },
     {
-      id: "TXN-004",
-      user: "sarah.jones@email.com",
-      crypto: "Cardano",
-      amount: "$2,600",
-      status: "completed",
-      date: "2025-01-14",
-    },
-    {
-      id: "TXN-005",
-      user: "alex.brown@email.com",
-      crypto: "Ripple",
-      amount: "$4,960",
-      status: "dispute",
-      date: "2025-01-13",
+      title: "Total Crypto Currencies",
+      value: "14",
+      icon: Bitcoin,
+      color: "text-accent",
+      bgColor: "bg-accent/10",
     },
   ];
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "completed":
-        return "bg-success/20 text-success border-success/30";
-      case "escrow":
-        return "bg-accent/20 text-accent border-accent/30";
-      case "pending":
-        return "bg-warning/20 text-warning border-warning/30";
-      case "dispute":
-        return "bg-danger/20 text-danger border-danger/30";
-      default:
-        return "bg-muted text-muted-foreground";
-    }
-  };
+  const p2pStats = [
+    {
+      title: "P2P Running Trade",
+      value: "48",
+      icon: Clock,
+      color: "text-warning",
+      bgColor: "bg-warning/10",
+    },
+    {
+      title: "P2P Completed Trade",
+      value: "5,114",
+      icon: CheckCircle2,
+      color: "text-success",
+      bgColor: "bg-success/10",
+    },
+    {
+      title: "P2P Reported Trade",
+      value: "23",
+      icon: FileText,
+      color: "text-danger",
+      bgColor: "bg-danger/10",
+    },
+    {
+      title: "P2P Total Ad",
+      value: "355",
+      icon: ShoppingBag,
+      color: "text-accent",
+      bgColor: "bg-accent/10",
+    },
+  ];
+
+  const orderSummary = [
+    { pair: "TRX_USDT", amount: "38.1137 TRX" },
+    { pair: "SHIB_USDT", amount: "0.2000 SHIB" },
+    { pair: "ETH_USDT", amount: "0.0019 ETH" },
+    { pair: "BTC_USD", amount: "0.0011 BTC" },
+    { pair: "SOL_USDT", amount: "0.0450 SOL" },
+    { pair: "ADA_USDT", amount: "12.3400 ADA" },
+  ];
 
   return (
     <SidebarProvider>
@@ -158,7 +180,7 @@ const AdminDashboard = () => {
         <Sidebar className="border-r border-border">
           <SidebarHeader className="p-6 border-b border-border">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-primary flex items-center justify-center">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-accent to-primary flex items-center justify-center">
                 <Activity className="w-6 h-6 text-white" />
               </div>
               <div>
@@ -173,21 +195,66 @@ const AdminDashboard = () => {
               <SidebarGroupLabel>Navigation</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
-                  {menuItems.map((item) => (
-                    <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton
-                        asChild
-                        isActive={activeTab === item.title}
-                        onClick={() => setActiveTab(item.title)}
-                        className="cursor-pointer"
+                  {menuItems.map((item) =>
+                    item.subItems ? (
+                      <Collapsible
+                        key={item.title}
+                        open={openMenus.includes(item.title)}
+                        onOpenChange={() => toggleMenu(item.title)}
                       >
-                        <div className="flex items-center gap-3 px-3 py-2">
-                          <item.icon className="w-5 h-5" />
-                          <span>{item.title}</span>
-                        </div>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
+                        <SidebarMenuItem>
+                          <CollapsibleTrigger className="w-full">
+                            <SidebarMenuButton
+                              isActive={activeTab === item.title}
+                              onClick={() => setActiveTab(item.title)}
+                              className="cursor-pointer"
+                            >
+                              <div className="flex items-center justify-between w-full px-3 py-2">
+                                <div className="flex items-center gap-3">
+                                  <item.icon className="w-5 h-5" />
+                                  <span>{item.title}</span>
+                                </div>
+                                {openMenus.includes(item.title) ? (
+                                  <ChevronDown className="w-4 h-4" />
+                                ) : (
+                                  <ChevronRight className="w-4 h-4" />
+                                )}
+                              </div>
+                            </SidebarMenuButton>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent className="pl-8 mt-1">
+                            {item.subItems.map((subItem) => (
+                              <SidebarMenuItem key={subItem.title}>
+                                <SidebarMenuButton
+                                  asChild
+                                  className="cursor-pointer text-sm"
+                                >
+                                  <div className="flex items-center gap-2 px-3 py-2">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground" />
+                                    <span>{subItem.title}</span>
+                                  </div>
+                                </SidebarMenuButton>
+                              </SidebarMenuItem>
+                            ))}
+                          </CollapsibleContent>
+                        </SidebarMenuItem>
+                      </Collapsible>
+                    ) : (
+                      <SidebarMenuItem key={item.title}>
+                        <SidebarMenuButton
+                          asChild
+                          isActive={activeTab === item.title}
+                          onClick={() => setActiveTab(item.title)}
+                          className="cursor-pointer"
+                        >
+                          <div className="flex items-center gap-3 px-3 py-2">
+                            <item.icon className="w-5 h-5" />
+                            <span>{item.title}</span>
+                          </div>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    )
+                  )}
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
@@ -215,137 +282,100 @@ const AdminDashboard = () => {
                   </p>
                 </div>
               </div>
-              <Link to="/">
-                <Button variant="outline">View Site</Button>
-              </Link>
+              <div className="flex items-center gap-3">
+                <Button variant="outline" className="gap-2">
+                  <Settings className="w-4 h-4" />
+                  Cron Setup
+                </Button>
+                <Link to="/">
+                  <Button variant="outline">View Site</Button>
+                </Link>
+              </div>
             </div>
           </header>
 
           <div className="p-4 md:p-6 space-y-6">
-            {/* Stats Grid */}
-            <div className="grid gap-4 md:gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {stats.map((stat) => (
+            {/* Main Stats Grid */}
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {mainStats.map((stat) => (
                 <Card
                   key={stat.title}
-                  className="p-6 border-2 hover:shadow-lg transition-all duration-300"
+                  className="p-5 border hover:shadow-lg transition-all duration-300 group cursor-pointer"
                 >
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <p className="text-sm text-muted-foreground mb-2">
+                        {stat.title}
+                      </p>
+                      <h3 className="text-3xl font-bold mb-1">{stat.value}</h3>
+                    </div>
                     <div
-                      className={`w-12 h-12 rounded-xl ${stat.bgColor} flex items-center justify-center`}
+                      className={`w-12 h-12 rounded-xl ${stat.bgColor} flex items-center justify-center group-hover:scale-110 transition-transform`}
                     >
                       <stat.icon className={`w-6 h-6 ${stat.color}`} />
                     </div>
-                    {stat.trend === "up" ? (
-                      <TrendingUp className="w-5 h-5 text-success" />
-                    ) : (
-                      <TrendingDown className="w-5 h-5 text-danger" />
-                    )}
                   </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">
-                      {stat.title}
-                    </p>
-                    <div className="flex items-baseline gap-2">
-                      <h3 className="text-2xl md:text-3xl font-bold">
-                        {stat.value}
-                      </h3>
-                      <span
-                        className={`text-sm font-medium ${
-                          stat.trend === "up" ? "text-success" : "text-danger"
-                        }`}
-                      >
-                        {stat.change}
-                      </span>
-                    </div>
-                  </div>
+                  <ChevronRight className="w-5 h-5 text-muted-foreground mt-2 group-hover:translate-x-1 transition-transform" />
                 </Card>
               ))}
             </div>
 
-            {/* Recent Transactions */}
-            <Card className="border-2">
-              <div className="p-6 border-b border-border">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-xl font-bold">Recent Transactions</h2>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Latest crypto transactions and their status
-                    </p>
-                  </div>
-                  <Button variant="outline">View All</Button>
-                </div>
+            {/* P2P Stats */}
+            <div>
+              <h2 className="text-xl font-bold mb-4">P2P Trading Overview</h2>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {p2pStats.map((stat) => (
+                  <Card
+                    key={stat.title}
+                    className="p-5 border hover:shadow-lg transition-all duration-300 group cursor-pointer"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <p className="text-sm text-muted-foreground mb-2">
+                          {stat.title}
+                        </p>
+                        <h3 className="text-3xl font-bold mb-1">{stat.value}</h3>
+                      </div>
+                      <div
+                        className={`w-12 h-12 rounded-xl ${stat.bgColor} flex items-center justify-center group-hover:scale-110 transition-transform`}
+                      >
+                        <stat.icon className={`w-6 h-6 ${stat.color}`} />
+                      </div>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-muted-foreground mt-2 group-hover:translate-x-1 transition-transform" />
+                  </Card>
+                ))}
               </div>
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="font-semibold">Transaction ID</TableHead>
-                      <TableHead className="font-semibold">User</TableHead>
-                      <TableHead className="font-semibold">Cryptocurrency</TableHead>
-                      <TableHead className="font-semibold">Amount</TableHead>
-                      <TableHead className="font-semibold">Status</TableHead>
-                      <TableHead className="font-semibold">Date</TableHead>
-                      <TableHead className="font-semibold text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {recentTransactions.map((transaction) => (
-                      <TableRow key={transaction.id} className="hover:bg-muted/50">
-                        <TableCell className="font-mono font-medium">
-                          {transaction.id}
-                        </TableCell>
-                        <TableCell>{transaction.user}</TableCell>
-                        <TableCell className="font-medium">
-                          {transaction.crypto}
-                        </TableCell>
-                        <TableCell className="font-semibold">
-                          {transaction.amount}
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            variant="outline"
-                            className={`${getStatusColor(
-                              transaction.status
-                            )} capitalize font-medium`}
-                          >
-                            {transaction.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-muted-foreground">
-                          {transaction.date}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Button variant="ghost" size="sm">
-                            View
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </Card>
+            </div>
 
-            {/* Quick Actions */}
-            <Card className="p-6 border-2">
-              <h2 className="text-xl font-bold mb-4">Quick Actions</h2>
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                <Button variant="outline" className="h-auto py-4 flex-col gap-2">
-                  <ShoppingBag className="w-5 h-5" />
-                  <span>Manage Ads</span>
-                </Button>
-                <Button variant="outline" className="h-auto py-4 flex-col gap-2">
-                  <Users className="w-5 h-5" />
-                  <span>View Users</span>
-                </Button>
-                <Button variant="outline" className="h-auto py-4 flex-col gap-2">
-                  <AlertCircle className="w-5 h-5" />
-                  <span>Resolve Disputes</span>
-                </Button>
-                <Button variant="outline" className="h-auto py-4 flex-col gap-2">
-                  <BarChart3 className="w-5 h-5" />
-                  <span>View Reports</span>
-                </Button>
+            {/* Order Summary */}
+            <Card className="border overflow-hidden">
+              <div className="p-6 border-b border-border bg-muted/30">
+                <h2 className="text-xl font-bold">Order Summary</h2>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Order summary presents visual & listing data of order,
+                  categories by pair, excluding canceled orders & scroll below to
+                  show all pair.
+                </p>
+              </div>
+              <div className="p-6">
+                <div className="grid gap-3">
+                  <div className="grid grid-cols-2 gap-4 pb-3 border-b font-semibold text-muted-foreground">
+                    <div>Pair</div>
+                    <div className="text-right">Amount</div>
+                  </div>
+                  {orderSummary.map((order, index) => (
+                    <div
+                      key={index}
+                      className="grid grid-cols-2 gap-4 py-3 border-b last:border-0 hover:bg-muted/50 transition-colors rounded-lg px-3"
+                    >
+                      <div className="font-medium">{order.pair}</div>
+                      <div className="text-right font-semibold text-accent">
+                        {order.amount}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </Card>
           </div>
