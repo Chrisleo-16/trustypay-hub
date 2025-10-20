@@ -20,6 +20,18 @@ const Auth = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Check for admin credentials during login
+    if (!isSignUp && email === "admin@secureswap.com" && password === "admin123") {
+      toast({
+        title: "Admin Login Successful",
+        description: "Redirecting to admin dashboard...",
+      });
+      setTimeout(() => {
+        window.location.href = "/admin";
+      }, 1000);
+      return;
+    }
+    
     if (isSignUp && password !== confirmPassword) {
       toast({
         title: "Passwords don't match",
@@ -35,6 +47,11 @@ const Auth = () => {
         ? "Your account has been created successfully."
         : "You've been signed in successfully.",
     });
+    
+    // Redirect to home
+    setTimeout(() => {
+      window.location.href = "/";
+    }, 1000);
   };
 
   return (
@@ -119,6 +136,14 @@ const Auth = () => {
             {isSignUp ? "Sign Up" : "Sign In"}
           </Button>
         </form>
+
+        {!isSignUp && (
+          <div className="mt-4 p-3 bg-accent/10 rounded-lg border border-accent/30">
+            <p className="text-xs font-semibold text-accent mb-2">Demo Admin Credentials:</p>
+            <p className="text-xs font-mono">Email: admin@secureswap.com</p>
+            <p className="text-xs font-mono">Password: admin123</p>
+          </div>
+        )}
 
         <div className="mt-6 text-center">
           <button

@@ -1,21 +1,20 @@
 import { useState } from "react";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import {
-  Users,
-  UserCheck,
-  Mail,
-  Smartphone,
-  RefreshCw,
-  DollarSign,
-  Bitcoin,
+  LayoutDashboard,
   ShoppingBag,
-  Activity,
-  TrendingUp,
+  CreditCard,
+  Users,
   AlertCircle,
-  CheckCircle2,
-  Clock,
+  BarChart3,
+  Settings,
+  LogOut,
+  TrendingUp,
+  TrendingDown,
+  DollarSign,
+  Activity,
   Package,
+  Menu,
 } from "lucide-react";
 import {
   SidebarProvider,
@@ -27,273 +26,332 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarHeader,
+  SidebarFooter,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { NavLink } from "react-router-dom";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
+const menuItems = [
+  { title: "Dashboard", icon: LayoutDashboard, url: "/admin" },
+  { title: "Ads", icon: ShoppingBag, url: "/admin/ads" },
+  { title: "Transactions", icon: CreditCard, url: "/admin/transactions" },
+  { title: "Users", icon: Users, url: "/admin/users" },
+  { title: "Disputes", icon: AlertCircle, url: "/admin/disputes" },
+  { title: "Reports", icon: BarChart3, url: "/admin/reports" },
+  { title: "Settings", icon: Settings, url: "/admin/settings" },
+];
 
 const AdminDashboard = () => {
+  const [activeTab, setActiveTab] = useState("Dashboard");
+
+  const stats = [
+    {
+      title: "Total Revenue",
+      value: "$127,458",
+      change: "+12.5%",
+      trend: "up",
+      icon: DollarSign,
+      color: "text-success",
+      bgColor: "bg-success/10",
+    },
+    {
+      title: "Active Ads",
+      value: "2,847",
+      change: "+8.2%",
+      trend: "up",
+      icon: Package,
+      color: "text-accent",
+      bgColor: "bg-accent/10",
+    },
+    {
+      title: "Total Users",
+      value: "12,456",
+      change: "+15.3%",
+      trend: "up",
+      icon: Users,
+      color: "text-primary",
+      bgColor: "bg-primary/10",
+    },
+    {
+      title: "Pending Disputes",
+      value: "23",
+      change: "-5.1%",
+      trend: "down",
+      icon: AlertCircle,
+      color: "text-warning",
+      bgColor: "bg-warning/10",
+    },
+  ];
+
+  const recentTransactions = [
+    {
+      id: "TXN-001",
+      user: "john.doe@email.com",
+      crypto: "Bitcoin",
+      amount: "$43,250",
+      status: "completed",
+      date: "2025-01-15",
+    },
+    {
+      id: "TXN-002",
+      user: "jane.smith@email.com",
+      crypto: "Ethereum",
+      amount: "$2,280",
+      status: "escrow",
+      date: "2025-01-15",
+    },
+    {
+      id: "TXN-003",
+      user: "mike.wilson@email.com",
+      crypto: "Solana",
+      amount: "$1,969",
+      status: "pending",
+      date: "2025-01-14",
+    },
+    {
+      id: "TXN-004",
+      user: "sarah.jones@email.com",
+      crypto: "Cardano",
+      amount: "$2,600",
+      status: "completed",
+      date: "2025-01-14",
+    },
+    {
+      id: "TXN-005",
+      user: "alex.brown@email.com",
+      crypto: "Ripple",
+      amount: "$4,960",
+      status: "dispute",
+      date: "2025-01-13",
+    },
+  ];
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "completed":
+        return "bg-success/20 text-success border-success/30";
+      case "escrow":
+        return "bg-accent/20 text-accent border-accent/30";
+      case "pending":
+        return "bg-warning/20 text-warning border-warning/30";
+      case "dispute":
+        return "bg-danger/20 text-danger border-danger/30";
+      default:
+        return "bg-muted text-muted-foreground";
+    }
+  };
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
-        <Sidebar className="border-r border-border" collapsible="icon">
-          <div className="p-4 border-b border-border">
-            <h2 className="font-bold text-lg">Admin Panel</h2>
-          </div>
+        <Sidebar className="border-r border-border">
+          <SidebarHeader className="p-6 border-b border-border">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-gradient-primary flex items-center justify-center">
+                <Activity className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h2 className="font-bold text-lg">SecureSwap</h2>
+                <p className="text-xs text-muted-foreground">Admin Panel</p>
+              </div>
+            </div>
+          </SidebarHeader>
+
           <SidebarContent>
             <SidebarGroup>
-              <SidebarGroupLabel>Overview</SidebarGroupLabel>
+              <SidebarGroupLabel>Navigation</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild>
-                      <NavLink to="/admin" end>
-                        <Activity className="mr-2 h-4 w-4" />
-                        <span>Dashboard</span>
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-
-            <SidebarGroup>
-              <SidebarGroupLabel>Manage P2P</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild>
-                      <NavLink to="/admin/running-trades">
-                        <Clock className="mr-2 h-4 w-4" />
-                        <span>Running Trade</span>
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild>
-                      <NavLink to="/admin/reported-trades">
-                        <AlertCircle className="mr-2 h-4 w-4" />
-                        <span>Reported Trade</span>
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild>
-                      <NavLink to="/admin/completed-trades">
-                        <CheckCircle2 className="mr-2 h-4 w-4" />
-                        <span>Completed Trade</span>
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild>
-                      <NavLink to="/admin/manage-ads">
-                        <ShoppingBag className="mr-2 h-4 w-4" />
-                        <span>Manage Ad</span>
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-
-            <SidebarGroup>
-              <SidebarGroupLabel>Orders</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild>
-                      <NavLink to="/admin/payment-window">
-                        <Clock className="mr-2 h-4 w-4" />
-                        <span>Payment Window</span>
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild>
-                      <NavLink to="/admin/payment-method">
-                        <DollarSign className="mr-2 h-4 w-4" />
-                        <span>Payment Method</span>
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
+                  {menuItems.map((item) => (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={activeTab === item.title}
+                        onClick={() => setActiveTab(item.title)}
+                        className="cursor-pointer"
+                      >
+                        <div className="flex items-center gap-3 px-3 py-2">
+                          <item.icon className="w-5 h-5" />
+                          <span>{item.title}</span>
+                        </div>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
           </SidebarContent>
+
+          <SidebarFooter className="p-4 border-t border-border">
+            <Button variant="outline" className="w-full justify-start gap-3">
+              <LogOut className="w-5 h-5" />
+              <span>Logout</span>
+            </Button>
+          </SidebarFooter>
         </Sidebar>
 
-        <main className="flex-1 overflow-y-auto">
-          <header className="h-16 border-b border-border flex items-center px-6 bg-card">
-            <SidebarTrigger />
-            <div className="ml-4 flex items-center justify-between flex-1">
-              <h1 className="text-2xl font-bold">Dashboard</h1>
-              <Button variant="outline">
-                Cron Setup
-              </Button>
+        <main className="flex-1 overflow-auto">
+          <header className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
+            <div className="flex items-center justify-between p-4 md:p-6">
+              <div className="flex items-center gap-4">
+                <SidebarTrigger>
+                  <Menu className="w-6 h-6" />
+                </SidebarTrigger>
+                <div>
+                  <h1 className="text-2xl md:text-3xl font-bold">Dashboard</h1>
+                  <p className="text-sm text-muted-foreground">
+                    Welcome back, Admin
+                  </p>
+                </div>
+              </div>
+              <Link to="/">
+                <Button variant="outline">View Site</Button>
+              </Link>
             </div>
           </header>
 
-          <div className="p-6">
+          <div className="p-4 md:p-6 space-y-6">
             {/* Stats Grid */}
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-              <StatCard
-                icon={Users}
-                label="Total Users"
-                value="2,756"
-                iconBg="bg-primary/10"
-                iconColor="text-primary"
-              />
-              <StatCard
-                icon={UserCheck}
-                label="Active Users"
-                value="2,473"
-                iconBg="bg-success/10"
-                iconColor="text-success"
-              />
-              <StatCard
-                icon={Mail}
-                label="Email Unverified Users"
-                value="244"
-                iconBg="bg-warning/10"
-                iconColor="text-warning"
-              />
-              <StatCard
-                icon={Smartphone}
-                label="Mobile Unverified Users"
-                value="0"
-                iconBg="bg-destructive/10"
-                iconColor="text-destructive"
-              />
-              <StatCard
-                icon={RefreshCw}
-                label="Total Trade"
-                value="0"
-                iconBg="bg-secondary/10"
-                iconColor="text-secondary"
-              />
-              <StatCard
-                icon={DollarSign}
-                label="Total Currencies"
-                value="44"
-                iconBg="bg-primary/10"
-                iconColor="text-primary"
-              />
-              <StatCard
-                icon={Bitcoin}
-                label="Total Crypto Currencies"
-                value="14"
-                iconBg="bg-warning/10"
-                iconColor="text-warning"
-              />
+            <div className="grid gap-4 md:gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {stats.map((stat) => (
+                <Card
+                  key={stat.title}
+                  className="p-6 border-2 hover:shadow-lg transition-all duration-300"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <div
+                      className={`w-12 h-12 rounded-xl ${stat.bgColor} flex items-center justify-center`}
+                    >
+                      <stat.icon className={`w-6 h-6 ${stat.color}`} />
+                    </div>
+                    {stat.trend === "up" ? (
+                      <TrendingUp className="w-5 h-5 text-success" />
+                    ) : (
+                      <TrendingDown className="w-5 h-5 text-danger" />
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">
+                      {stat.title}
+                    </p>
+                    <div className="flex items-baseline gap-2">
+                      <h3 className="text-2xl md:text-3xl font-bold">
+                        {stat.value}
+                      </h3>
+                      <span
+                        className={`text-sm font-medium ${
+                          stat.trend === "up" ? "text-success" : "text-danger"
+                        }`}
+                      >
+                        {stat.change}
+                      </span>
+                    </div>
+                  </div>
+                </Card>
+              ))}
             </div>
 
-            {/* P2P Stats */}
-            <div className="mb-8">
-              <h2 className="text-xl font-bold mb-4">P2P Trading Overview</h2>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <StatCard
-                  icon={Clock}
-                  label="P2P Running Trade"
-                  value="48"
-                  iconBg="bg-warning/10"
-                  iconColor="text-warning"
-                  clickable
-                />
-                <StatCard
-                  icon={CheckCircle2}
-                  label="P2P Completed Trade"
-                  value="5,114"
-                  iconBg="bg-success/10"
-                  iconColor="text-success"
-                  clickable
-                />
-                <StatCard
-                  icon={Package}
-                  label="P2P Completed Trade"
-                  value="5,162"
-                  iconBg="bg-secondary/10"
-                  iconColor="text-secondary"
-                  clickable
-                />
-                <StatCard
-                  icon={ShoppingBag}
-                  label="P2P Total Ad"
-                  value="355"
-                  iconBg="bg-primary/10"
-                  iconColor="text-primary"
-                  clickable
-                />
+            {/* Recent Transactions */}
+            <Card className="border-2">
+              <div className="p-6 border-b border-border">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-xl font-bold">Recent Transactions</h2>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Latest crypto transactions and their status
+                    </p>
+                  </div>
+                  <Button variant="outline">View All</Button>
+                </div>
               </div>
-            </div>
-
-            {/* Order Summary */}
-            <Card className="p-6">
-              <h2 className="text-xl font-bold mb-2">Order Summary</h2>
-              <p className="text-sm text-muted-foreground mb-6">
-                Order summary presents visual & listing data of order, categories by pair, excluding canceled orders & scroll below to show all pair.
-              </p>
-              
               <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-border">
-                      <th className="text-left py-3 font-semibold">Pair</th>
-                      <th className="text-right py-3 font-semibold">Amount</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr className="border-b border-border">
-                      <td className="py-3 text-muted-foreground">TRX_USDT</td>
-                      <td className="py-3 text-right font-medium">38.1137 TRX</td>
-                    </tr>
-                    <tr className="border-b border-border">
-                      <td className="py-3 text-muted-foreground">SHIB_USDT</td>
-                      <td className="py-3 text-right font-medium">0.2000 SHIB</td>
-                    </tr>
-                    <tr className="border-b border-border">
-                      <td className="py-3 text-muted-foreground">ETH_USDT</td>
-                      <td className="py-3 text-right font-medium">0.0019 ETH</td>
-                    </tr>
-                    <tr>
-                      <td className="py-3 text-muted-foreground">BTC_USD</td>
-                      <td className="py-3 text-right font-medium">0.0011 BTC</td>
-                    </tr>
-                  </tbody>
-                </table>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="font-semibold">Transaction ID</TableHead>
+                      <TableHead className="font-semibold">User</TableHead>
+                      <TableHead className="font-semibold">Cryptocurrency</TableHead>
+                      <TableHead className="font-semibold">Amount</TableHead>
+                      <TableHead className="font-semibold">Status</TableHead>
+                      <TableHead className="font-semibold">Date</TableHead>
+                      <TableHead className="font-semibold text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {recentTransactions.map((transaction) => (
+                      <TableRow key={transaction.id} className="hover:bg-muted/50">
+                        <TableCell className="font-mono font-medium">
+                          {transaction.id}
+                        </TableCell>
+                        <TableCell>{transaction.user}</TableCell>
+                        <TableCell className="font-medium">
+                          {transaction.crypto}
+                        </TableCell>
+                        <TableCell className="font-semibold">
+                          {transaction.amount}
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant="outline"
+                            className={`${getStatusColor(
+                              transaction.status
+                            )} capitalize font-medium`}
+                          >
+                            {transaction.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {transaction.date}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button variant="ghost" size="sm">
+                            View
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </Card>
+
+            {/* Quick Actions */}
+            <Card className="p-6 border-2">
+              <h2 className="text-xl font-bold mb-4">Quick Actions</h2>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                <Button variant="outline" className="h-auto py-4 flex-col gap-2">
+                  <ShoppingBag className="w-5 h-5" />
+                  <span>Manage Ads</span>
+                </Button>
+                <Button variant="outline" className="h-auto py-4 flex-col gap-2">
+                  <Users className="w-5 h-5" />
+                  <span>View Users</span>
+                </Button>
+                <Button variant="outline" className="h-auto py-4 flex-col gap-2">
+                  <AlertCircle className="w-5 h-5" />
+                  <span>Resolve Disputes</span>
+                </Button>
+                <Button variant="outline" className="h-auto py-4 flex-col gap-2">
+                  <BarChart3 className="w-5 h-5" />
+                  <span>View Reports</span>
+                </Button>
               </div>
             </Card>
           </div>
         </main>
       </div>
     </SidebarProvider>
-  );
-};
-
-interface StatCardProps {
-  icon: React.ElementType;
-  label: string;
-  value: string;
-  iconBg: string;
-  iconColor: string;
-  clickable?: boolean;
-}
-
-const StatCard = ({ icon: Icon, label, value, iconBg, iconColor, clickable }: StatCardProps) => {
-  return (
-    <Card className={`p-4 ${clickable ? 'hover:shadow-md cursor-pointer transition-all' : ''}`}>
-      <div className="flex items-start justify-between">
-        <div className={`rounded-lg ${iconBg} p-3`}>
-          <Icon className={`h-6 w-6 ${iconColor}`} />
-        </div>
-        {clickable && (
-          <TrendingUp className="h-4 w-4 text-muted-foreground" />
-        )}
-      </div>
-      <div className="mt-4">
-        <div className="text-sm text-muted-foreground mb-1">{label}</div>
-        <div className="text-3xl font-bold">{value}</div>
-      </div>
-    </Card>
   );
 };
 

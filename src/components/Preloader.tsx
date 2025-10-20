@@ -4,18 +4,22 @@ const Preloader = ({ onComplete }: { onComplete: () => void }) => {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    const interval = setInterval(() => {
+    const totalDuration = 6000; // 6 seconds
+    const interval = 60; // Update every 60ms for smooth animation
+    const increment = 100 / (totalDuration / interval);
+
+    const timer = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
-          clearInterval(interval);
+          clearInterval(timer);
           setTimeout(onComplete, 300);
           return 100;
         }
-        return prev + 10;
+        return Math.min(prev + increment, 100);
       });
-    }, 150);
+    }, interval);
 
-    return () => clearInterval(interval);
+    return () => clearInterval(timer);
   }, [onComplete]);
 
   return (

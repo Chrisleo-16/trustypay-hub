@@ -24,81 +24,99 @@ const Marketplace = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Mock data - will be replaced with real data
+  const [selectedCrypto, setSelectedCrypto] = useState("all");
+
+  // Mock crypto ads data
   const mockAds = [
     {
       id: 1,
-      title: "iPhone 14 Pro Max - Excellent Condition",
-      price: 899,
+      title: "Bitcoin (BTC)",
+      price: 43250.50,
+      amount: 0.5,
       currency: "USD",
-      category: "Electronics",
+      category: "Bitcoin",
       location: "New York, NY",
-      seller: "John Doe",
-      rating: 4.8,
-      reviews: 23,
-      image: "https://images.unsplash.com/photo-1632661674596-df8be070a5c5?w=400&h=300&fit=crop",
+      seller: "CryptoKing",
+      rating: 4.9,
+      reviews: 156,
+      image: "https://images.unsplash.com/photo-1518546305927-5a555bb7020d?w=400&h=300&fit=crop",
+      change24h: 2.5,
     },
     {
       id: 2,
-      title: "Gaming Laptop - RTX 3070",
-      price: 1299,
+      title: "Ethereum (ETH)",
+      price: 2280.75,
+      amount: 2.5,
       currency: "USD",
-      category: "Electronics",
+      category: "Ethereum",
       location: "San Francisco, CA",
-      seller: "TechSeller",
-      rating: 4.9,
-      reviews: 45,
-      image: "https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=400&h=300&fit=crop",
+      seller: "EthTrader",
+      rating: 4.8,
+      reviews: 89,
+      image: "https://images.unsplash.com/photo-1622630998477-20aa696ecb05?w=400&h=300&fit=crop",
+      change24h: -1.2,
     },
     {
       id: 3,
-      title: "Designer Watch - Limited Edition",
-      price: 450,
+      title: "Binance Coin (BNB)",
+      price: 315.20,
+      amount: 10,
       currency: "USD",
-      category: "Fashion",
+      category: "Altcoin",
       location: "Los Angeles, CA",
-      seller: "LuxuryDeals",
-      rating: 5.0,
-      reviews: 12,
-      image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=300&fit=crop",
+      seller: "BinanceExpert",
+      rating: 4.7,
+      reviews: 67,
+      image: "https://images.unsplash.com/photo-1621416894569-0f39ed31d247?w=400&h=300&fit=crop",
+      change24h: 3.8,
     },
     {
       id: 4,
-      title: "Mountain Bike - Carbon Frame",
-      price: 650,
+      title: "Cardano (ADA)",
+      price: 0.52,
+      amount: 5000,
       currency: "USD",
-      category: "Sports",
-      location: "Denver, CO",
-      seller: "BikeGuru",
-      rating: 4.7,
-      reviews: 18,
-      image: "https://images.unsplash.com/photo-1576435728678-68d0fbf94e91?w=400&h=300&fit=crop",
+      category: "Altcoin",
+      location: "Chicago, IL",
+      seller: "AdaHolder",
+      rating: 4.6,
+      reviews: 45,
+      image: "https://images.unsplash.com/photo-1640161704729-cbe966a08476?w=400&h=300&fit=crop",
+      change24h: 1.5,
     },
     {
       id: 5,
-      title: "Vintage Camera Collection",
-      price: 320,
+      title: "Solana (SOL)",
+      price: 98.45,
+      amount: 20,
       currency: "USD",
-      category: "Electronics",
-      location: "Chicago, IL",
-      seller: "PhotoPro",
-      rating: 4.6,
-      reviews: 8,
-      image: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400&h=300&fit=crop",
+      category: "Altcoin",
+      location: "Miami, FL",
+      seller: "SolanaTrader",
+      rating: 4.9,
+      reviews: 112,
+      image: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=400&h=300&fit=crop",
+      change24h: 5.2,
     },
     {
       id: 6,
-      title: "Leather Sofa - Modern Design",
-      price: 1100,
+      title: "Ripple (XRP)",
+      price: 0.62,
+      amount: 8000,
       currency: "USD",
-      category: "Furniture",
-      location: "Seattle, WA",
-      seller: "HomeStyle",
-      rating: 4.9,
-      reviews: 31,
-      image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&h=300&fit=crop",
+      category: "Altcoin",
+      location: "Austin, TX",
+      seller: "XRPArmy",
+      rating: 4.5,
+      reviews: 78,
+      image: "https://images.unsplash.com/photo-1621416894569-0f39ed31d247?w=400&h=300&fit=crop",
+      change24h: -0.8,
     },
   ];
+
+  const filteredAds = selectedCrypto === "all" 
+    ? mockAds 
+    : mockAds.filter(ad => ad.category.toLowerCase() === selectedCrypto.toLowerCase());
 
   return (
     <div className="min-h-screen bg-background">
@@ -107,32 +125,31 @@ const Marketplace = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">Browse Marketplace</h1>
-          <p className="text-muted-foreground">Discover great deals from verified sellers</p>
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">Crypto Marketplace</h1>
+          <p className="text-muted-foreground">Buy and sell cryptocurrencies securely with verified traders</p>
         </div>
 
         {/* Search and Filters */}
-        <Card className="p-4 mb-8">
+        <Card className="p-4 mb-8 border-2">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search for items..."
+                placeholder="Search cryptocurrencies..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
               />
             </div>
-            <Select defaultValue="all">
-              <SelectTrigger className="w-full md:w-48">
-                <SelectValue placeholder="Category" />
+            <Select value={selectedCrypto} onValueChange={setSelectedCrypto}>
+              <SelectTrigger className="w-full md:w-52">
+                <SelectValue placeholder="Select Crypto" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                <SelectItem value="electronics">Electronics</SelectItem>
-                <SelectItem value="fashion">Fashion</SelectItem>
-                <SelectItem value="sports">Sports</SelectItem>
-                <SelectItem value="furniture">Furniture</SelectItem>
+                <SelectItem value="all">All Cryptocurrencies</SelectItem>
+                <SelectItem value="bitcoin">Bitcoin (BTC)</SelectItem>
+                <SelectItem value="ethereum">Ethereum (ETH)</SelectItem>
+                <SelectItem value="altcoin">Altcoins</SelectItem>
               </SelectContent>
             </Select>
             <Select defaultValue="newest">
@@ -174,7 +191,7 @@ const Marketplace = () => {
               </Card>
             ))
           ) : (
-            mockAds.map((ad, index) => (
+            filteredAds.map((ad, index) => (
             <Link key={ad.id} to={`/ad/${ad.id}`}>
               <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 h-full animate-fade-in" style={{ animationDelay: `${index * 0.05}s` }}>
                 <div className="aspect-video overflow-hidden">
@@ -186,16 +203,24 @@ const Marketplace = () => {
                 </div>
                 <div className="p-4">
                   <div className="flex items-start justify-between mb-2">
-                    <Badge variant="secondary" className="text-xs">
+                    <Badge variant="secondary" className="text-xs font-semibold">
                       {ad.category}
                     </Badge>
-                    <div className="text-2xl font-bold text-primary">
-                      ${ad.price}
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-primary">
+                        ${ad.price.toLocaleString()}
+                      </div>
+                      <div className={`text-xs font-medium ${ad.change24h >= 0 ? 'text-success' : 'text-danger'}`}>
+                        {ad.change24h >= 0 ? '↑' : '↓'} {Math.abs(ad.change24h)}%
+                      </div>
                     </div>
                   </div>
-                  <h3 className="font-semibold text-lg mb-2 line-clamp-2">
+                  <h3 className="font-semibold text-lg mb-1 line-clamp-1">
                     {ad.title}
                   </h3>
+                  <div className="text-sm text-muted-foreground mb-3">
+                    Amount: {ad.amount.toLocaleString()} {ad.category === 'Bitcoin' ? 'BTC' : ad.category === 'Ethereum' ? 'ETH' : 'units'}
+                  </div>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                     <MapPin className="h-4 w-4" />
                     {ad.location}
@@ -219,8 +244,8 @@ const Marketplace = () => {
 
         {/* Load More */}
         <div className="text-center mt-12">
-          <Button size="lg" variant="outline">
-            Load More Ads
+          <Button size="lg" variant="accent">
+            Load More Listings
           </Button>
         </div>
       </div>
