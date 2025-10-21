@@ -8,137 +8,138 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Backgrounds - Soft light theme */
-    --background: 216 50% 98%;
-    --foreground: 222 47% 11%;
+    /* Light theme backgrounds */
+    --background: 0 0% 100%;
+    --foreground: 280 10% 10%;
 
-    /* Cards with subtle elevation */
+    /* Cards */
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 280 10% 10%;
 
     /* Popovers */
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 280 10% 10%;
 
-    /* Primary - Deep Midnight Blue */
-    --primary: 222 47% 11%;
+    /* Primary - Vibrant Red */
+    --primary: 355 85% 55%;
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 222 47% 20%;
+    --primary-hover: 355 85% 45%;
 
-    /* Secondary - Warm Slate */
-    --secondary: 215 16% 47%;
+    /* Secondary - Deep Purple */
+    --secondary: 280 30% 25%;
     --secondary-foreground: 0 0% 100%;
 
-    /* Accent - Electric Cyan for CTAs */
-    --accent: 187 95% 43%;
+    /* Accent - Bright Red for CTAs */
+    --accent: 355 85% 55%;
     --accent-foreground: 0 0% 100%;
-    --accent-hover: 187 95% 35%;
+    --accent-hover: 355 85% 45%;
 
-    /* Success - Mint Green */
-    --success: 158 64% 52%;
+    /* Success - Green */
+    --success: 142 71% 45%;
     --success-foreground: 0 0% 100%;
-    --success-light: 158 64% 95%;
+    --success-light: 142 71% 95%;
 
-    /* Warning - Amber */
+    /* Warning - Orange */
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
     --warning-light: 38 92% 95%;
 
-    /* Destructive - Rose Red */
+    /* Destructive - Red */
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Muted elements */
-    --muted: 216 20% 95%;
-    --muted-foreground: 215 16% 35%;
+    /* Muted */
+    --muted: 280 10% 95%;
+    --muted-foreground: 280 10% 40%;
 
-    /* Borders and inputs */
-    --border: 216 20% 90%;
-    --input: 216 20% 90%;
-    --ring: 187 95% 43%;
+    /* Borders */
+    --border: 280 10% 90%;
+    --input: 280 10% 90%;
+    --ring: 355 85% 55%;
 
-    --radius: 0.875rem;
+    --radius: 0.75rem;
 
-    /* Gradients for CTAs */
-    --gradient-primary: linear-gradient(135deg, hsl(187 95% 43%), hsl(187 95% 35%));
-    --gradient-success: linear-gradient(135deg, hsl(158 64% 52%), hsl(170 60% 50%));
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(355 85% 55%), hsl(355 85% 45%));
+    --gradient-dark: linear-gradient(180deg, hsl(280 30% 10%), hsl(280 40% 5%));
     
-    /* Shadows for depth - soft and modern */
+    /* Shadows */
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --shadow-md: 0 4px 12px -2px rgb(0 0 0 / 0.08);
-    --shadow-lg: 0 10px 24px -4px rgb(0 0 0 / 0.1);
-    --shadow-glow: 0 0 32px hsl(187 95% 43% / 0.2);
+    --shadow-md: 0 4px 12px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 24px -4px rgb(0 0 0 / 0.15);
+    --shadow-glow: 0 0 40px hsl(355 85% 55% / 0.3);
+    --shadow-glow-lg: 0 0 80px hsl(355 85% 55% / 0.4);
 
-    /* Sidebar tokens */
-    --sidebar-background: 222 47% 11%;
-    --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 187 95% 43%;
+    /* Sidebar */
+    --sidebar-background: 280 30% 10%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 355 85% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 222 47% 20%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 222 47% 20%;
-    --sidebar-ring: 187 95% 43%;
+    --sidebar-accent: 280 30% 15%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 280 30% 20%;
+    --sidebar-ring: 355 85% 55%;
   }
 
   .dark {
-    /* Dark backgrounds */
-    --background: 222 47% 7%;
+    /* Dark theme - Deep Purple/Black */
+    --background: 280 30% 8%;
     --foreground: 0 0% 98%;
 
     /* Dark cards */
-    --card: 222 47% 11%;
+    --card: 280 30% 12%;
     --card-foreground: 0 0% 98%;
 
     /* Dark popovers */
-    --popover: 222 47% 11%;
+    --popover: 280 30% 12%;
     --popover-foreground: 0 0% 98%;
 
-    /* Primary adjustments for dark */
-    --primary: 222 47% 15%;
+    /* Primary - Vibrant Red */
+    --primary: 355 85% 55%;
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 222 47% 25%;
+    --primary-hover: 355 85% 65%;
 
-    /* Secondary for dark */
-    --secondary: 215 16% 55%;
-    --secondary-foreground: 0 0% 100%;
+    /* Secondary */
+    --secondary: 280 30% 20%;
+    --secondary-foreground: 0 0% 98%;
 
-    /* Accent - Electric Cyan for dark */
-    --accent: 187 95% 50%;
+    /* Accent - Bright Red */
+    --accent: 355 85% 55%;
     --accent-foreground: 0 0% 100%;
-    --accent-hover: 187 95% 60%;
+    --accent-hover: 355 85% 65%;
 
-    /* Success states */
-    --success: 158 64% 52%;
+    /* Success */
+    --success: 142 71% 45%;
     --success-foreground: 0 0% 100%;
-    --success-light: 158 64% 15%;
+    --success-light: 142 71% 15%;
 
-    /* Warning states */
+    /* Warning */
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
     --warning-light: 38 92% 15%;
 
-    /* Muted dark */
-    --muted: 222 47% 15%;
-    --muted-foreground: 215 16% 60%;
+    /* Muted */
+    --muted: 280 30% 15%;
+    --muted-foreground: 280 10% 60%;
 
     /* Destructive */
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Borders dark */
-    --border: 222 47% 20%;
-    --input: 222 47% 20%;
-    --ring: 187 95% 50%;
+    /* Borders */
+    --border: 280 30% 20%;
+    --input: 280 30% 20%;
+    --ring: 355 85% 55%;
 
     /* Dark sidebar */
-    --sidebar-background: 222 47% 11%;
+    --sidebar-background: 280 30% 10%;
     --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 187 95% 50%;
+    --sidebar-primary: 355 85% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 222 47% 20%;
+    --sidebar-accent: 280 30% 15%;
     --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 222 47% 20%;
-    --sidebar-ring: 187 95% 50%;
+    --sidebar-border: 280 30% 20%;
+    --sidebar-ring: 355 85% 55%;
   }
 }
 

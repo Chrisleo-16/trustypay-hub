@@ -194,8 +194,8 @@ const Index = () => {
                 <div className="rounded-lg bg-gradient-primary p-2">
                   <ShieldCheck className="h-5 w-5 text-white" />
                 </div>
-                <span className="bg-gradient-primary bg-clip-text text-transparent">
-                  TrustMarket
+                <span className="text-foreground">
+                  Arcanum
                 </span>
               </div>
               <p className="text-sm text-muted-foreground">
@@ -205,25 +205,25 @@ const Index = () => {
             <div>
               <h4 className="font-bold mb-4">Platform</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link to="/marketplace" className="hover:text-primary transition-colors">Browse Ads</Link></li>
+                <li><Link to="/marketplace" className="hover:text-primary transition-colors">Marketplace</Link></li>
                 <li><Link to="/how-it-works" className="hover:text-primary transition-colors">How It Works</Link></li>
-                <li><Link to="/about" className="hover:text-primary transition-colors">About Us</Link></li>
+                <li><Link to="/about" className="hover:text-primary transition-colors">About</Link></li>
               </ul>
             </div>
             <div>
               <h4 className="font-bold mb-4">Support</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-primary transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Safety Tips</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Contact Us</a></li>
+                <li><Link to="/help-center" className="hover:text-primary transition-colors">Help Center</Link></li>
+                <li><Link to="/safety-tips" className="hover:text-primary transition-colors">Safety Tips</Link></li>
+                <li><Link to="/contact" className="hover:text-primary transition-colors">Contact</Link></li>
               </ul>
             </div>
             <div>
               <h4 className="font-bold mb-4">Legal</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-primary transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Terms of Service</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Cookie Policy</a></li>
+                <li><Link to="/privacy-policy" className="hover:text-primary transition-colors">Privacy Policy</Link></li>
+                <li><Link to="/terms" className="hover:text-primary transition-colors">Terms of Service</Link></li>
+                <li><Link to="/cookie-policy" className="hover:text-primary transition-colors">Cookie Policy</Link></li>
               </ul>
             </div>
           </div>

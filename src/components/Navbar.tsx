@@ -11,24 +11,27 @@ export const Navbar = () => {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <Link to="/" className="flex items-center gap-2 font-bold text-xl">
-            <div className="rounded-lg bg-gradient-primary p-2">
+            <div className="rounded-lg bg-primary p-2">
               <ShieldCheck className="h-5 w-5 text-white" />
             </div>
-            <span className="bg-gradient-primary bg-clip-text text-transparent">
-              TrustMarket
+            <span className="text-foreground">
+              Arcanum
             </span>
           </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-6">
             <Link to="/marketplace" className="text-sm font-medium text-foreground hover:text-primary transition-colors">
-              Browse Ads
+              Marketplace
             </Link>
             <Link to="/how-it-works" className="text-sm font-medium text-foreground hover:text-primary transition-colors">
               How It Works
             </Link>
             <Link to="/about" className="text-sm font-medium text-foreground hover:text-primary transition-colors">
               About
+            </Link>
+            <Link to="/contact" className="text-sm font-medium text-foreground hover:text-primary transition-colors">
+              Contact
             </Link>
           </div>
 
@@ -37,7 +40,7 @@ export const Navbar = () => {
               <Button variant="ghost">Sign In</Button>
             </Link>
             <Link to="/auth?mode=signup">
-              <Button className="bg-gradient-primary hover:opacity-90">
+              <Button className="bg-primary hover:bg-primary-hover">
                 Get Started
               </Button>
             </Link>
