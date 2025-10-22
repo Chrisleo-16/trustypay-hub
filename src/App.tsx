@@ -23,6 +23,18 @@ import Users from "./pages/admin/Users";
 import Trades from "./pages/admin/Trades";
 import Currencies from "./pages/admin/Currencies";
 import Ads from "./pages/admin/Ads";
+import Orders from "./pages/admin/Orders";
+import PendingOrders from "./pages/admin/PendingOrders";
+import CompletedOrders from "./pages/admin/CompletedOrders";
+import RunningTrades from "./pages/admin/RunningTrades";
+import ReportedTrades from "./pages/admin/ReportedTrades";
+import CompletedTrades from "./pages/admin/CompletedTrades";
+import PaymentWindow from "./pages/admin/PaymentWindow";
+import PaymentMethods from "./pages/admin/PaymentMethods";
+import Transactions from "./pages/admin/Transactions";
+import Disputes from "./pages/admin/Disputes";
+import Reports from "./pages/admin/Reports";
+import Settings from "./pages/admin/Settings";
 
 const queryClient = new QueryClient();
 
@@ -65,10 +77,22 @@ const App = () => {
             <Route path="/terms" element={<Terms />} />
             <Route path="/cookie-policy" element={<CookiePolicy />} />
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/orders" element={<Orders />} />
+            <Route path="/admin/orders/pending" element={<PendingOrders />} />
+            <Route path="/admin/orders/completed" element={<CompletedOrders />} />
+            <Route path="/admin/p2p/running" element={<RunningTrades />} />
+            <Route path="/admin/p2p/reported" element={<ReportedTrades />} />
+            <Route path="/admin/p2p/completed" element={<CompletedTrades />} />
+            <Route path="/admin/ads" element={<Ads />} />
+            <Route path="/admin/p2p/payment-window" element={<PaymentWindow />} />
+            <Route path="/admin/p2p/payment-method" element={<PaymentMethods />} />
+            <Route path="/admin/transactions" element={<Transactions />} />
+            <Route path="/admin/disputes" element={<Disputes />} />
+            <Route path="/admin/reports" element={<Reports />} />
+            <Route path="/admin/settings" element={<Settings />} />
             <Route path="/admin/users" element={<Users />} />
             <Route path="/admin/trades" element={<Trades />} />
             <Route path="/admin/currencies" element={<Currencies />} />
-            <Route path="/admin/ads" element={<Ads />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

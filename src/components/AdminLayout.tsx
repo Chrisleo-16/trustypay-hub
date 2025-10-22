@@ -50,26 +50,34 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       title: "Manage Order",
       icon: ShoppingCart,
       subItems: [
-        { title: "All Trades", url: "/admin/trades" },
-        { title: "Running Trades", url: "/admin/trades?status=running" },
-        { title: "Completed Trades", url: "/admin/trades?status=completed" },
-        { title: "Reported", url: "/admin/trades?status=reported" }
+        { title: "All Orders", url: "/admin/orders" },
+        { title: "Pending Orders", url: "/admin/orders/pending" },
+        { title: "Completed Orders", url: "/admin/orders/completed" },
       ],
     },
     {
       title: "Manage P2P",
       icon: Users,
       subItems: [
-        { title: "All Users", url: "/admin/users" },
-        { title: "Active Users", url: "/admin/users?status=active" },
-        { title: "Unverified Users", url: "/admin/users?status=unverified" }
+        { title: "Running Trade", url: "/admin/p2p/running" },
+        { title: "Reported Trade", url: "/admin/p2p/reported" },
+        { title: "Completed Trade", url: "/admin/p2p/completed" },
+        { title: "Manage Ad", url: "/admin/ads" },
+        { title: "Payment Window", url: "/admin/p2p/payment-window" },
+        { title: "Payment Method", url: "/admin/p2p/payment-method" },
       ],
     },
-    { title: "Manage Currency", icon: DollarSign, url: "/admin/currencies" },
-    { title: "Manage Ads", icon: FileText, url: "/admin/ads" },
+    { title: "Transactions", icon: DollarSign, url: "/admin/transactions" },
+    { title: "Disputes", icon: FileText, url: "/admin/disputes" },
+    { title: "Reports", icon: FileText, url: "/admin/reports" },
+    { title: "Settings", icon: Settings, url: "/admin/settings" },
   ];
 
   const handleLogout = () => {
+    // Clear any session data
+    sessionStorage.clear();
+    localStorage.clear();
+    // Navigate to auth page
     navigate("/auth");
   };
 
