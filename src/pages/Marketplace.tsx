@@ -1,256 +1,458 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Search, SlidersHorizontal, MapPin, Star } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { 
+  CheckCircle2, 
+  Shield, 
+  Clock, 
+  DollarSign,
+  Loader2,
+  AlertCircle,
+  TrendingUp
+} from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
-const Marketplace = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [loading, setLoading] = useState(true);
+type OrderStage = 'listing' | 'placing' | 'waiting' | 'confirming' | 'success';
+type TradeType = 'buy' | 'sell';
 
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1200);
-    return () => clearTimeout(timer);
-  }, []);
+interface Ad {
+  id: number;
+  user: string;
+  verified: boolean;
+  currency: string;
+  price: number;
+  paymentMethods: string[];
+  minAmount: number;
+  maxAmount: number;
+  rating: number;
+  trades: number;
+}
 
-  const [selectedCrypto, setSelectedCrypto] = useState("all");
+const P2PMarket = () => {
+  const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState<TradeType>('buy');
+  const [orderStage, setOrderStage] = useState<OrderStage>('listing');
+  const [showModal, setShowModal] = useState(false);
+  const [selectedAd, setSelectedAd] = useState<Ad | null>(null);
+  const [amount, setAmount] = useState("");
+  const [countdown, setCountdown] = useState(900); // 15 minutes in seconds
+  const [orderDetails, setOrderDetails] = useState<any>(null);
 
-  // Mock crypto ads data
-  const mockAds = [
+  // Mock ads data
+  const sellAds: Ad[] = [
     {
       id: 1,
-      title: "Bitcoin (BTC)",
-      price: 43250.50,
-      amount: 0.5,
-      currency: "USD",
-      category: "Bitcoin",
-      location: "New York, NY",
-      seller: "CryptoKing",
+      user: "CryptoKing99",
+      verified: true,
+      currency: "USDT",
+      price: 1.02,
+      paymentMethods: ["Bank Transfer", "PayPal"],
+      minAmount: 50,
+      maxAmount: 5000,
       rating: 4.9,
-      reviews: 156,
-      image: "https://images.unsplash.com/photo-1518546305927-5a555bb7020d?w=400&h=300&fit=crop",
-      change24h: 2.5,
+      trades: 1250
     },
     {
       id: 2,
-      title: "Ethereum (ETH)",
-      price: 2280.75,
-      amount: 2.5,
-      currency: "USD",
-      category: "Ethereum",
-      location: "San Francisco, CA",
-      seller: "EthTrader",
+      user: "BitMaster",
+      verified: true,
+      currency: "BTC",
+      price: 43250,
+      paymentMethods: ["Bank Transfer", "Wise"],
+      minAmount: 100,
+      maxAmount: 10000,
       rating: 4.8,
-      reviews: 89,
-      image: "https://images.unsplash.com/photo-1622630998477-20aa696ecb05?w=400&h=300&fit=crop",
-      change24h: -1.2,
+      trades: 890
     },
     {
       id: 3,
-      title: "Binance Coin (BNB)",
-      price: 315.20,
-      amount: 10,
-      currency: "USD",
-      category: "Altcoin",
-      location: "Los Angeles, CA",
-      seller: "BinanceExpert",
+      user: "EthTrader",
+      verified: true,
+      currency: "ETH",
+      price: 2280,
+      paymentMethods: ["PayPal", "Venmo"],
+      minAmount: 200,
+      maxAmount: 8000,
       rating: 4.7,
-      reviews: 67,
-      image: "https://images.unsplash.com/photo-1621416894569-0f39ed31d247?w=400&h=300&fit=crop",
-      change24h: 3.8,
-    },
-    {
-      id: 4,
-      title: "Cardano (ADA)",
-      price: 0.52,
-      amount: 5000,
-      currency: "USD",
-      category: "Altcoin",
-      location: "Chicago, IL",
-      seller: "AdaHolder",
-      rating: 4.6,
-      reviews: 45,
-      image: "https://images.unsplash.com/photo-1640161704729-cbe966a08476?w=400&h=300&fit=crop",
-      change24h: 1.5,
-    },
-    {
-      id: 5,
-      title: "Solana (SOL)",
-      price: 98.45,
-      amount: 20,
-      currency: "USD",
-      category: "Altcoin",
-      location: "Miami, FL",
-      seller: "SolanaTrader",
-      rating: 4.9,
-      reviews: 112,
-      image: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=400&h=300&fit=crop",
-      change24h: 5.2,
-    },
-    {
-      id: 6,
-      title: "Ripple (XRP)",
-      price: 0.62,
-      amount: 8000,
-      currency: "USD",
-      category: "Altcoin",
-      location: "Austin, TX",
-      seller: "XRPArmy",
-      rating: 4.5,
-      reviews: 78,
-      image: "https://images.unsplash.com/photo-1621416894569-0f39ed31d247?w=400&h=300&fit=crop",
-      change24h: -0.8,
+      trades: 567
     },
   ];
 
-  const filteredAds = selectedCrypto === "all" 
-    ? mockAds 
-    : mockAds.filter(ad => ad.category.toLowerCase() === selectedCrypto.toLowerCase());
+  const buyAds: Ad[] = [
+    {
+      id: 4,
+      user: "WhaleInvestor",
+      verified: true,
+      currency: "USDT",
+      price: 0.98,
+      paymentMethods: ["Bank Transfer"],
+      minAmount: 100,
+      maxAmount: 20000,
+      rating: 5.0,
+      trades: 2100
+    },
+    {
+      id: 5,
+      user: "CryptoCollector",
+      verified: true,
+      currency: "BNB",
+      price: 315,
+      paymentMethods: ["Bank Transfer", "Zelle"],
+      minAmount: 50,
+      maxAmount: 5000,
+      rating: 4.9,
+      trades: 1450
+    },
+  ];
+
+  const handleOpenOrder = (ad: Ad, type: TradeType) => {
+    setSelectedAd(ad);
+    setActiveTab(type);
+    setShowModal(true);
+    setOrderStage('placing');
+  };
+
+  const handlePlaceOrder = () => {
+    if (!amount || parseFloat(amount) < (selectedAd?.minAmount || 0)) {
+      toast({
+        title: "Invalid Amount",
+        description: `Minimum amount is $${selectedAd?.minAmount}`,
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setOrderDetails({
+      amount: parseFloat(amount),
+      price: selectedAd?.price,
+      currency: selectedAd?.currency,
+      paymentMethod: selectedAd?.paymentMethods[0],
+      user: selectedAd?.user
+    });
+
+    setOrderStage('waiting');
+    
+    toast({
+      title: "Order Placed!",
+      description: "Waiting for the other party to confirm.",
+    });
+
+    // Simulate seller confirmation after 5 seconds
+    setTimeout(() => {
+      setOrderStage('confirming');
+      toast({
+        title: activeTab === 'buy' ? "Funds Transferred!" : "Payment Received!",
+        description: "Please confirm to continue.",
+      });
+    }, 5000);
+
+    // Start countdown if selling
+    if (activeTab === 'sell') {
+      const timer = setInterval(() => {
+        setCountdown(prev => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+  };
+
+  const handleConfirmReceipt = () => {
+    setOrderStage('success');
+    toast({
+      title: "Success!",
+      description: "Assets released successfully.",
+    });
+
+    setTimeout(() => {
+      setShowModal(false);
+      setOrderStage('listing');
+      setAmount("");
+      setCountdown(900);
+    }, 3000);
+  };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const AdCard = ({ ad, type }: { ad: Ad; type: TradeType }) => (
+    <Card className="hover:shadow-lg transition-all duration-300 border-2">
+      <CardContent className="p-6">
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+              <span className="font-bold text-primary">{ad.user[0]}</span>
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-semibold">{ad.user}</span>
+                {ad.verified && (
+                  <Shield className="w-4 h-4 text-success fill-success" />
+                )}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {ad.trades} trades | {ad.rating}★
+              </div>
+            </div>
+          </div>
+          <Badge variant="secondary" className="text-sm font-bold">
+            {ad.currency}
+          </Badge>
+        </div>
+
+        <div className="space-y-3 mb-4">
+          <div className="flex justify-between items-center">
+            <span className="text-muted-foreground">Price</span>
+            <span className="text-xl font-bold text-primary">
+              ${ad.price.toLocaleString()}
+            </span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-muted-foreground">Limit</span>
+            <span className="font-medium">
+              ${ad.minAmount} - ${ad.maxAmount.toLocaleString()}
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {ad.paymentMethods.map((method) => (
+              <Badge key={method} variant="outline" className="text-xs">
+                {method}
+              </Badge>
+            ))}
+          </div>
+        </div>
+
+        <Button 
+          className="w-full" 
+          onClick={() => handleOpenOrder(ad, type)}
+          variant={type === 'buy' ? 'default' : 'accent'}
+        >
+          {type === 'buy' ? 'Buy' : 'Sell'} {ad.currency}
+        </Button>
+      </CardContent>
+    </Card>
+  );
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-
+      
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">Crypto Marketplace</h1>
-          <p className="text-muted-foreground">Buy and sell cryptocurrencies securely with verified traders</p>
+          <h1 className="text-3xl md:text-4xl font-bold mb-2 flex items-center gap-3">
+            <TrendingUp className="w-8 h-8 text-primary" />
+            P2P Trading Market
+          </h1>
+          <p className="text-muted-foreground">
+            Trade directly with verified users in a secure escrow environment
+          </p>
         </div>
 
-        {/* Search and Filters */}
-        <Card className="p-4 mb-8 border-2">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search cryptocurrencies..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TradeType)} className="w-full">
+          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
+            <TabsTrigger value="buy" className="text-lg">Buy Crypto</TabsTrigger>
+            <TabsTrigger value="sell" className="text-lg">Sell Crypto</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="buy" className="mt-0 animate-fade-in">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {sellAds.map((ad) => (
+                <AdCard key={ad.id} ad={ad} type="buy" />
+              ))}
             </div>
-            <Select value={selectedCrypto} onValueChange={setSelectedCrypto}>
-              <SelectTrigger className="w-full md:w-52">
-                <SelectValue placeholder="Select Crypto" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Cryptocurrencies</SelectItem>
-                <SelectItem value="bitcoin">Bitcoin (BTC)</SelectItem>
-                <SelectItem value="ethereum">Ethereum (ETH)</SelectItem>
-                <SelectItem value="altcoin">Altcoins</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select defaultValue="newest">
-              <SelectTrigger className="w-full md:w-48">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="newest">Newest First</SelectItem>
-                <SelectItem value="price-low">Price: Low to High</SelectItem>
-                <SelectItem value="price-high">Price: High to Low</SelectItem>
-                <SelectItem value="rating">Highest Rated</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button variant="outline" className="w-full md:w-auto">
-              <SlidersHorizontal className="mr-2 h-4 w-4" />
-              More Filters
-            </Button>
-          </div>
-        </Card>
+          </TabsContent>
 
-        {/* Ads Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {loading ? (
-            Array.from({ length: 6 }).map((_, i) => (
-              <Card key={i} className="overflow-hidden">
-                <Skeleton className="w-full aspect-video" />
-                <div className="p-4 space-y-3">
-                  <div className="flex justify-between items-start">
-                    <Skeleton className="h-5 w-20" />
-                    <Skeleton className="h-7 w-16" />
-                  </div>
-                  <Skeleton className="h-6 w-full" />
-                  <Skeleton className="h-4 w-3/4" />
-                  <div className="flex justify-between items-center pt-3">
-                    <Skeleton className="h-4 w-24" />
-                    <Skeleton className="h-4 w-16" />
-                  </div>
-                </div>
-              </Card>
-            ))
-          ) : (
-            filteredAds.map((ad, index) => (
-            <Link key={ad.id} to={`/ad/${ad.id}`}>
-              <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 h-full animate-fade-in" style={{ animationDelay: `${index * 0.05}s` }}>
-                <div className="aspect-video overflow-hidden">
-                  <img
-                    src={ad.image}
-                    alt={ad.title}
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-                <div className="p-4">
-                  <div className="flex items-start justify-between mb-2">
-                    <Badge variant="secondary" className="text-xs font-semibold">
-                      {ad.category}
-                    </Badge>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-primary">
-                        ${ad.price.toLocaleString()}
-                      </div>
-                      <div className={`text-xs font-medium ${ad.change24h >= 0 ? 'text-success' : 'text-danger'}`}>
-                        {ad.change24h >= 0 ? '↑' : '↓'} {Math.abs(ad.change24h)}%
-                      </div>
-                    </div>
-                  </div>
-                  <h3 className="font-semibold text-lg mb-1 line-clamp-1">
-                    {ad.title}
-                  </h3>
-                  <div className="text-sm text-muted-foreground mb-3">
-                    Amount: {ad.amount.toLocaleString()} {ad.category === 'Bitcoin' ? 'BTC' : ad.category === 'Ethereum' ? 'ETH' : 'units'}
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                    <MapPin className="h-4 w-4" />
-                    {ad.location}
-                  </div>
-                  <div className="flex items-center justify-between pt-3 border-t border-border">
-                    <div className="text-sm font-medium">{ad.seller}</div>
-                    <div className="flex items-center gap-1">
-                      <Star className="h-4 w-4 fill-warning text-warning" />
-                      <span className="text-sm font-medium">{ad.rating}</span>
-                      <span className="text-xs text-muted-foreground">
-                        ({ad.reviews})
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            </Link>
-            ))
-          )}
-        </div>
-
-        {/* Load More */}
-        <div className="text-center mt-12">
-          <Button size="lg" variant="accent">
-            Load More Listings
-          </Button>
-        </div>
+          <TabsContent value="sell" className="mt-0 animate-fade-in">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {buyAds.map((ad) => (
+                <AdCard key={ad.id} ad={ad} type="sell" />
+              ))}
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
+
+      {/* Order Modal */}
+      <Dialog open={showModal} onOpenChange={setShowModal}>
+        <DialogContent className="sm:max-w-md">
+          {orderStage === 'placing' && (
+            <>
+              <DialogHeader>
+                <DialogTitle>
+                  {activeTab === 'buy' ? 'Buy' : 'Sell'} {selectedAd?.currency}
+                </DialogTitle>
+              </DialogHeader>
+              
+              <div className="space-y-4 py-4">
+                <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
+                  <span className="text-muted-foreground">Price</span>
+                  <span className="text-xl font-bold">${selectedAd?.price}</span>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="amount">Amount (USD)</Label>
+                  <Input
+                    id="amount"
+                    type="number"
+                    placeholder={`Min: $${selectedAd?.minAmount}`}
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    className="text-lg"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Range: ${selectedAd?.minAmount} - ${selectedAd?.maxAmount}
+                  </p>
+                </div>
+
+                <div className="p-4 bg-muted rounded-lg space-y-2">
+                  <div className="flex justify-between">
+                    <span>You will receive</span>
+                    <span className="font-bold">
+                      {amount && selectedAd?.price 
+                        ? (parseFloat(amount) / selectedAd.price).toFixed(4)
+                        : '0.0000'
+                      } {selectedAd?.currency}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm text-muted-foreground">
+                    <span>Payment</span>
+                    <span>{selectedAd?.paymentMethods[0]}</span>
+                  </div>
+                </div>
+
+                <Button 
+                  className="w-full" 
+                  size="lg"
+                  onClick={handlePlaceOrder}
+                  disabled={!amount}
+                >
+                  Place Order
+                </Button>
+              </div>
+            </>
+          )}
+
+          {orderStage === 'waiting' && (
+            <div className="py-8 text-center space-y-6">
+              <div className="flex justify-center">
+                <div className="relative">
+                  <Loader2 className="w-16 h-16 text-primary animate-spin" />
+                  <Clock className="w-6 h-6 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-xl font-bold mb-2">
+                  Waiting for {activeTab === 'buy' ? 'Seller' : 'Buyer'}...
+                </h3>
+                <p className="text-muted-foreground">
+                  {activeTab === 'buy' 
+                    ? 'Waiting for seller to transfer funds' 
+                    : 'Waiting for buyer to transfer payment'
+                  }
+                </p>
+              </div>
+
+              {activeTab === 'sell' && (
+                <div className="inline-flex items-center gap-2 px-6 py-3 bg-primary/10 rounded-full">
+                  <Clock className="w-5 h-5 text-primary" />
+                  <span className="text-2xl font-mono font-bold text-primary">
+                    {formatTime(countdown)}
+                  </span>
+                </div>
+              )}
+
+              <Card className="p-4 text-left space-y-2 bg-muted">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Amount</span>
+                  <span className="font-medium">${orderDetails?.amount}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Rate</span>
+                  <span className="font-medium">${orderDetails?.price}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Payment</span>
+                  <span className="font-medium">{orderDetails?.paymentMethod}</span>
+                </div>
+              </Card>
+            </div>
+          )}
+
+          {orderStage === 'confirming' && (
+            <div className="py-8 text-center space-y-6">
+              <div className="flex justify-center">
+                <div className="w-16 h-16 rounded-full bg-success/20 flex items-center justify-center">
+                  <DollarSign className="w-8 h-8 text-success" />
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-xl font-bold mb-2">
+                  {activeTab === 'buy' ? 'Funds Received!' : 'Payment Confirmed!'}
+                </h3>
+                <p className="text-muted-foreground">
+                  Confirm you have received {activeTab === 'buy' ? 'the funds' : 'payment'} before releasing assets
+                </p>
+              </div>
+
+              <div className="flex items-start gap-3 p-4 bg-warning/10 rounded-lg border-2 border-warning/20">
+                <AlertCircle className="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-left">
+                  <strong>Important:</strong> Only click "Release Assets" after verifying {activeTab === 'buy' ? 'the funds are in your account' : 'you received the payment'}.
+                </p>
+              </div>
+
+              <Button 
+                className="w-full" 
+                size="lg"
+                onClick={handleConfirmReceipt}
+              >
+                <CheckCircle2 className="w-5 h-5 mr-2" />
+                Release Assets
+              </Button>
+            </div>
+          )}
+
+          {orderStage === 'success' && (
+            <div className="py-12 text-center space-y-6 animate-scale-in">
+              <div className="flex justify-center">
+                <div className="w-20 h-20 rounded-full bg-success/20 flex items-center justify-center animate-pulse">
+                  <CheckCircle2 className="w-12 h-12 text-success" />
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-2xl font-bold mb-2 text-success">
+                  Trade Completed!
+                </h3>
+                <p className="text-muted-foreground">
+                  Your transaction has been completed successfully
+                </p>
+              </div>
+
+              <div className="inline-flex items-center gap-2 text-sm text-muted-foreground">
+                <span>Redirecting...</span>
+                <Loader2 className="w-4 h-4 animate-spin" />
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
 
-export default Marketplace;
+export default P2PMarket;
