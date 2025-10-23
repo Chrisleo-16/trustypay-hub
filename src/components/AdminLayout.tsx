@@ -28,6 +28,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ShieldCheck } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -36,6 +38,7 @@ interface AdminLayoutProps {
 const AdminLayout = ({ children }: AdminLayoutProps) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { toast } = useToast();
   const [openMenus, setOpenMenus] = useState<string[]>(["Manage Order", "Manage P2P"]);
 
   const toggleMenu = (title: string) => {
@@ -73,12 +76,21 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
     { title: "Settings", icon: Settings, url: "/admin/settings" },
   ];
 
-  const handleLogout = () => {
-    // Clear any session data
-    sessionStorage.clear();
-    localStorage.clear();
-    // Navigate to auth page
-    navigate("/auth");
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast({
+        title: "Logged out",
+        description: "You've been logged out successfully.",
+      });
+      navigate("/auth");
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to log out.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Preloader from "./components/Preloader";
 import RouteLoader from "./components/RouteLoader";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Index from "./pages/Index";
 import Marketplace from "./pages/Marketplace";
 import Auth from "./pages/Auth";
@@ -76,23 +77,23 @@ const App = () => {
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/cookie-policy" element={<CookiePolicy />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/orders" element={<Orders />} />
-            <Route path="/admin/orders/pending" element={<PendingOrders />} />
-            <Route path="/admin/orders/completed" element={<CompletedOrders />} />
-            <Route path="/admin/p2p/running" element={<RunningTrades />} />
-            <Route path="/admin/p2p/reported" element={<ReportedTrades />} />
-            <Route path="/admin/p2p/completed" element={<CompletedTrades />} />
-            <Route path="/admin/ads" element={<Ads />} />
-            <Route path="/admin/p2p/payment-window" element={<PaymentWindow />} />
-            <Route path="/admin/p2p/payment-method" element={<PaymentMethods />} />
-            <Route path="/admin/transactions" element={<Transactions />} />
-            <Route path="/admin/disputes" element={<Disputes />} />
-            <Route path="/admin/reports" element={<Reports />} />
-            <Route path="/admin/settings" element={<Settings />} />
-            <Route path="/admin/users" element={<Users />} />
-            <Route path="/admin/trades" element={<Trades />} />
-            <Route path="/admin/currencies" element={<Currencies />} />
+            <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />
+            <Route path="/admin/orders" element={<ProtectedRoute requireAdmin><Orders /></ProtectedRoute>} />
+            <Route path="/admin/orders/pending" element={<ProtectedRoute requireAdmin><PendingOrders /></ProtectedRoute>} />
+            <Route path="/admin/orders/completed" element={<ProtectedRoute requireAdmin><CompletedOrders /></ProtectedRoute>} />
+            <Route path="/admin/p2p/running" element={<ProtectedRoute requireAdmin><RunningTrades /></ProtectedRoute>} />
+            <Route path="/admin/p2p/reported" element={<ProtectedRoute requireAdmin><ReportedTrades /></ProtectedRoute>} />
+            <Route path="/admin/p2p/completed" element={<ProtectedRoute requireAdmin><CompletedTrades /></ProtectedRoute>} />
+            <Route path="/admin/ads" element={<ProtectedRoute requireAdmin><Ads /></ProtectedRoute>} />
+            <Route path="/admin/p2p/payment-window" element={<ProtectedRoute requireAdmin><PaymentWindow /></ProtectedRoute>} />
+            <Route path="/admin/p2p/payment-method" element={<ProtectedRoute requireAdmin><PaymentMethods /></ProtectedRoute>} />
+            <Route path="/admin/transactions" element={<ProtectedRoute requireAdmin><Transactions /></ProtectedRoute>} />
+            <Route path="/admin/disputes" element={<ProtectedRoute requireAdmin><Disputes /></ProtectedRoute>} />
+            <Route path="/admin/reports" element={<ProtectedRoute requireAdmin><Reports /></ProtectedRoute>} />
+            <Route path="/admin/settings" element={<ProtectedRoute requireAdmin><Settings /></ProtectedRoute>} />
+            <Route path="/admin/users" element={<ProtectedRoute requireAdmin><Users /></ProtectedRoute>} />
+            <Route path="/admin/trades" element={<ProtectedRoute requireAdmin><Trades /></ProtectedRoute>} />
+            <Route path="/admin/currencies" element={<ProtectedRoute requireAdmin><Currencies /></ProtectedRoute>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

@@ -1,13 +1,15 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ShieldCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const Auth = () => {
+  const navigate = useNavigate();
   const [isSignUp, setIsSignUp] = useState(
     new URLSearchParams(window.location.search).get("mode") === "signup"
   );
@@ -15,43 +17,78 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    // Check if user is already logged in
+    const checkUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        navigate("/");
+      }
+    };
+    checkUser();
+  }, [navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     
-    // Check for admin credentials during login
-    if (!isSignUp && email === "admin@secureswap.com" && password === "admin123") {
+    try {
+      if (isSignUp) {
+        if (password !== confirmPassword) {
+          toast({
+            title: "Passwords don't match",
+            description: "Please make sure your passwords match.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/`,
+            data: {
+              full_name: fullName,
+            },
+          },
+        });
+
+        if (error) throw error;
+
+        toast({
+          title: "Account created!",
+          description: "You've been signed up successfully.",
+        });
+        
+        navigate("/");
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (error) throw error;
+
+        toast({
+          title: "Welcome back!",
+          description: "You've been signed in successfully.",
+        });
+        
+        navigate("/");
+      }
+    } catch (error: any) {
       toast({
-        title: "Admin Login Successful",
-        description: "Redirecting to admin dashboard...",
-      });
-      setTimeout(() => {
-        window.location.href = "/admin";
-      }, 1000);
-      return;
-    }
-    
-    if (isSignUp && password !== confirmPassword) {
-      toast({
-        title: "Passwords don't match",
-        description: "Please make sure your passwords match.",
+        title: "Error",
+        description: error.message || "An error occurred. Please try again.",
         variant: "destructive",
       });
-      return;
+    } finally {
+      setLoading(false);
     }
-
-    toast({
-      title: isSignUp ? "Account created!" : "Welcome back!",
-      description: isSignUp 
-        ? "Your account has been created successfully."
-        : "You've been signed in successfully.",
-    });
-    
-    // Redirect to home
-    setTimeout(() => {
-      window.location.href = "/";
-    }, 1000);
   };
 
   return (
@@ -132,18 +169,11 @@ const Auth = () => {
             type="submit"
             className="w-full bg-gradient-primary hover:opacity-90"
             size="lg"
+            disabled={loading}
           >
-            {isSignUp ? "Sign Up" : "Sign In"}
+            {loading ? "Please wait..." : (isSignUp ? "Sign Up" : "Sign In")}
           </Button>
         </form>
-
-        {!isSignUp && (
-          <div className="mt-4 p-3 bg-accent/10 rounded-lg border border-accent/30">
-            <p className="text-xs font-semibold text-accent mb-2">Demo Admin Credentials:</p>
-            <p className="text-xs font-mono">Email: admin@secureswap.com</p>
-            <p className="text-xs font-mono">Password: admin123</p>
-          </div>
-        )}
 
         <div className="mt-6 text-center">
           <button
