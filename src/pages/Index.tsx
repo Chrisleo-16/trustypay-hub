@@ -55,7 +55,7 @@ const Index = () => {
               <span className="text-sm text-primary">WELCOME TO THE FUTURE</span>
             </div>
             <h1 className="text-5xl md:text-7xl font-bold mb-6">
-              Secure Your Digital <br />
+              <span className="text-secondary">Secure Your Digital </span><br />
               <span className="text-primary">Financial Future.</span>
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto">
