@@ -135,7 +135,7 @@ export default function AuthGlassModal() {
     <div
       className="min-h-screen flex items-center justify-center p-6"
       style={{
-        backgroundImage: "url('/src/assets/wallpaper-crypto-theme-high-quality-photo-382426897.webp')",
+        backgroundImage: "url('/public/wallpaper-crypto-theme-high-quality-photo-382426897.webp')",
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
