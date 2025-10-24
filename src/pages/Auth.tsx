@@ -40,7 +40,7 @@ const Auth = () => {
         }
 
         // Redirect based on role
-        if (roleData?.role === "admin") {
+        if (roleData?.role === "authenticated") {
           navigate("/admin", { replace: true });
         } else {
           navigate("/", { replace: true });
