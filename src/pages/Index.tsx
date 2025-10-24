@@ -83,7 +83,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <span className="text-primary text-sm font-bold tracking-wider">DIGITAL ECOSYSTEM</span>
-            <h2 className="text-4xl md:text-5xl font-bold mt-4 mb-6">The Digital Assets You Need</h2>
+            <h2 className="text-4xl md:text-5xl font-bold mt-4 mb-6 text-foreground">The Digital Assets You Need</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Everything you need to manage, trade, and grow your cryptocurrency portfolio
             </p>
@@ -128,7 +128,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <span className="text-primary text-sm font-bold tracking-wider">POWERFUL FEATURES</span>
-            <h2 className="text-4xl md:text-5xl font-bold mt-4 mb-6">The Power of Our Platform</h2>
+            <h2 className="text-4xl md:text-5xl font-bold mt-4 mb-6 text-foreground">The Power of Our Platform</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Professional-grade tools designed for traders of all levels
             </p>
@@ -186,7 +186,7 @@ const Index = () => {
           <div className="grid md:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
             <div>
               <span className="text-primary text-sm font-bold tracking-wider">ENTERPRISE SECURITY</span>
-              <h2 className="text-4xl md:text-5xl font-bold mt-4 mb-6">Your Assets Are Safe</h2>
+              <h2 className="text-4xl md:text-5xl font-bold mt-4 mb-6 text-foreground">Your Assets Are Safe</h2>
               <p className="text-xl text-muted-foreground mb-8">
                 We employ military-grade security measures to protect your investments
               </p>
@@ -258,7 +258,7 @@ const Index = () => {
 
             <div>
               <span className="text-primary text-sm font-bold tracking-wider">REAL-TIME DATA</span>
-              <h2 className="text-4xl md:text-5xl font-bold mt-4 mb-6">Your Assets Are Growing</h2>
+              <h2 className="text-4xl md:text-5xl font-bold mt-4 mb-6 text-foreground">Your Assets Are Growing</h2>
               
               <div className="grid grid-cols-2 gap-6 mt-8">
                 <Card className="p-6">
@@ -296,7 +296,7 @@ const Index = () => {
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center max-w-3xl mx-auto">
             <span className="text-primary text-sm font-bold tracking-wider">START TODAY</span>
-            <h2 className="text-4xl md:text-5xl font-bold mt-4 mb-6">Unlock Your Trading Potential</h2>
+            <h2 className="text-4xl md:text-5xl font-bold mt-4 mb-6 text-foreground">Unlock Your Trading Potential</h2>
             <p className="text-xl text-muted-foreground mb-8">
               Join thousands of traders who trust Arcanum for secure, fast, and profitable cryptocurrency trading
             </p>
@@ -324,7 +324,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <span className="text-primary text-sm font-bold tracking-wider">TESTIMONIALS</span>
-            <h2 className="text-4xl md:text-5xl font-bold mt-4 mb-6">What Our Clients Say</h2>
+            <h2 className="text-4xl md:text-5xl font-bold mt-4 mb-6 text-foreground">What Our Clients Say</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Real stories from real traders who've transformed their financial future
             </p>
@@ -415,7 +415,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <span className="text-primary text-sm font-bold tracking-wider">FAQ</span>
-            <h2 className="text-4xl md:text-5xl font-bold mt-4 mb-6">Your Questions Answered</h2>
+            <h2 className="text-4xl md:text-5xl font-bold mt-4 mb-6 text-foreground">Your Questions Answered</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Everything you need to know about trading on Arcanum
             </p>
@@ -424,46 +424,46 @@ const Index = () => {
           <div className="max-w-3xl mx-auto">
             <Accordion type="single" collapsible className="w-full">
               <AccordionItem value="item-1">
-                <AccordionTrigger className="text-left text-lg">
+                <AccordionTrigger className="text-left text-lg text-foreground">
                   What is P2P cryptocurrency trading?
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground">
+                <AccordionContent className="text-foreground">
                   P2P (peer-to-peer) cryptocurrency trading allows you to buy and sell crypto directly with other users without an intermediary. Arcanum provides the secure platform and escrow service to ensure safe transactions.
                 </AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-2">
-                <AccordionTrigger className="text-left text-lg">
+                <AccordionTrigger className="text-left text-lg text-foreground">
                   How does the escrow system work?
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground">
+                <AccordionContent className="text-foreground">
                   When a trade is initiated, the seller's cryptocurrency is locked in escrow. Once the buyer confirms payment, the crypto is released to the buyer. This protects both parties and ensures fair transactions.
                 </AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-3">
-                <AccordionTrigger className="text-left text-lg">
+                <AccordionTrigger className="text-left text-lg text-foreground">
                   Is cryptocurrency trading risky?
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground">
+                <AccordionContent className="text-foreground">
                   All investments carry risk, but Arcanum minimizes trading risks through escrow protection, user verification, and 24/7 security monitoring. We recommend starting small and only trading what you can afford to lose.
                 </AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-4">
-                <AccordionTrigger className="text-left text-lg">
+                <AccordionTrigger className="text-left text-lg text-foreground">
                   What fees does Arcanum charge?
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground">
+                <AccordionContent className="text-foreground">
                   We charge a competitive 1% transaction fee on completed trades. There are no hidden fees, monthly subscriptions, or withdrawal charges. What you see is what you pay.
                 </AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-5">
-                <AccordionTrigger className="text-left text-lg">
+                <AccordionTrigger className="text-left text-lg text-foreground">
                   How long does verification take?
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground">
+                <AccordionContent className="text-foreground">
                   Account verification typically takes 1-2 business days. You'll need to provide a government-issued ID and proof of address. Verified users get higher trading limits and access to premium features.
                 </AccordionContent>
               </AccordionItem>
@@ -481,7 +481,7 @@ const Index = () => {
         }}></div>
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center max-w-3xl mx-auto">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Begin?</h2>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">Ready to Begin?</h2>
             <p className="text-xl text-muted-foreground mb-8">
               Join thousands of traders who've already discovered the future of cryptocurrency trading
             </p>
@@ -502,7 +502,7 @@ const Index = () => {
             <div className="grid md:grid-cols-2 gap-12">
               <div>
                 <span className="text-primary text-sm font-bold tracking-wider">CONTACT US</span>
-                <h2 className="text-4xl md:text-5xl font-bold mt-4 mb-6">Get in Touch</h2>
+                <h2 className="text-4xl md:text-5xl font-bold mt-4 mb-6 text-foreground">Get in Touch</h2>
                 <p className="text-xl text-muted-foreground mb-8">
                   Have questions? Our team is here to help you 24/7
                 </p>

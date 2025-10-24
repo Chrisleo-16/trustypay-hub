@@ -66,19 +66,30 @@ const Auth = () => {
         
         navigate("/");
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
 
         if (error) throw error;
 
-        toast({
-          title: "Welcome back!",
-          description: "You've been signed in successfully.",
-        });
-        
-        navigate("/");
+        // Check if user is admin and redirect accordingly
+        if (data.user) {
+          const { data: roleData } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', data.user.id)
+            .eq('role', 'admin')
+            .maybeSingle();
+
+          toast({
+            title: "Welcome back!",
+            description: "You've been signed in successfully.",
+          });
+
+          // Redirect to admin dashboard if admin, otherwise to home
+          navigate(roleData ? "/admin" : "/");
+        }
       }
     } catch (error: any) {
       toast({
