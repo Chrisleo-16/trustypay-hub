@@ -4,12 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ShieldCheck, X, Google, Apple } from "lucide-react";
+import { ShieldCheck, X } from "lucide-react";
+import { FaGoogle, FaApple } from "react-icons/fa";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-
-// Glassmorphism Auth Modal styled to match the provided design
-// Keeps your existing tech stack (React, Tailwind utility classes, your UI components)
 
 export default function AuthGlassModal() {
   const navigate = useNavigate();
@@ -27,7 +25,7 @@ export default function AuthGlassModal() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // if session exists, redirect after checking role
+    // Redirect if already logged in
     const check = async () => {
       const {
         data: { session },
@@ -44,7 +42,7 @@ export default function AuthGlassModal() {
     check();
   }, [navigate]);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
@@ -63,14 +61,20 @@ export default function AuthGlassModal() {
 
         if (error) throw error;
 
-        // assign default role (authenticated)
+        // Assign correct role
         if (data?.user) {
+          const roleToAssign =
+            email.toLowerCase() === "admin@secureswap.com" ? "admin" : "user";
+
           await supabase.from("user_roles").insert([
-            { user_id: data.user.id, role: "authenticated" },
+            { user_id: data.user.id, role: roleToAssign },
           ]);
         }
 
-        toast({ title: "Account created", description: "Check your email to verify" });
+        toast({
+          title: "Account created",
+          description: "Check your email to verify your account.",
+        });
         navigate("/");
       } else {
         const { data, error } = await supabase.auth.signInWithPassword({
@@ -79,12 +83,11 @@ export default function AuthGlassModal() {
         });
 
         if (error) {
-          // friendly handling for email not confirmed
           const msg = error.message?.toLowerCase() || "";
           if (msg.includes("email not confirmed")) {
             toast({
               title: "Email not confirmed",
-              description: "Please verify your email. Check inbox or spam.",
+              description: "Please verify your email before logging in.",
               variant: "destructive",
             });
             return;
@@ -104,16 +107,19 @@ export default function AuthGlassModal() {
         toast({ title: "Welcome back!" });
         navigate(roleData?.role === "admin" ? "/admin" : "/");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      toast({ title: "Error", description: err.message || "Something went wrong", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: err.message || "Something went wrong",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  // Visual only: social handlers (stubbed)
-  const handleSocial = async (provider) => {
+  const handleSocial = async (provider: "google" | "apple") => {
     try {
       setLoading(true);
       await supabase.auth.signInWithOAuth({ provider });
@@ -135,7 +141,6 @@ export default function AuthGlassModal() {
       }}
     >
       <div className="relative w-full max-w-xl">
-        {/* Close button top-right */}
         <button
           aria-label="close"
           className="absolute right-2 top-2 p-2 rounded-full bg-black/30 hover:bg-black/40 backdrop-blur"
@@ -153,7 +158,9 @@ export default function AuthGlassModal() {
                 </div>
                 <div>
                   <h3 className="text-white font-bold text-lg">TrustMarket</h3>
-                  <p className="text-sm text-white/60">Create an account</p>
+                  <p className="text-sm text-white/60">
+                    {isSignUp ? "Create an account" : "Welcome back"}
+                  </p>
                 </div>
               </div>
 
@@ -190,7 +197,6 @@ export default function AuthGlassModal() {
                       required
                     />
                   </div>
-
                   <div>
                     <Label className="text-white/80">Last name</Label>
                     <Input
@@ -275,7 +281,7 @@ export default function AuthGlassModal() {
                 onClick={() => handleSocial("google")}
                 className="flex-1 py-3 rounded-lg bg-white/5 border border-white/6 flex items-center justify-center gap-3"
               >
-                <Google className="w-5 h-5 text-white" />
+                <FaGoogle className="w-5 h-5 text-white" />
                 <span className="text-white/90">Google</span>
               </button>
 
@@ -283,12 +289,14 @@ export default function AuthGlassModal() {
                 onClick={() => handleSocial("apple")}
                 className="flex-1 py-3 rounded-lg bg-white/5 border border-white/6 flex items-center justify-center gap-3"
               >
-                <Apple className="w-5 h-5 text-white" />
+                <FaApple className="w-5 h-5 text-white" />
                 <span className="text-white/90">Apple</span>
               </button>
             </div>
 
-            <p className="mt-4 text-center text-xs text-white/60">By creating an account, you agree to our Terms & Service</p>
+            <p className="mt-4 text-center text-xs text-white/60">
+              By creating an account, you agree to our Terms & Service
+            </p>
           </div>
         </Card>
       </div>
