@@ -47,9 +47,9 @@ const menuItems = [
   {
     title: "Manage Order",
     icon: ShoppingBag,
-    url: "/admin/orders",
+    // url: "/admin/orders",
     subItems: [
-      { title: "All Orders", url: "/admin/orders/all" },
+      { title: "All Orders", url: "/admin/orders" },
       { title: "Pending Orders", url: "/admin/orders/pending" },
       { title: "Completed Orders", url: "/admin/orders/completed" },
     ],
@@ -57,7 +57,7 @@ const menuItems = [
   {
     title: "Manage P2P",
     icon: Users,
-    url: "/admin/p2p",
+    // url: "/admin/p2p",
     subItems: [
       { title: "Running Trade", url: "/admin/p2p/running" },
       { title: "Reported Trade", url: "/admin/p2p/reported" },
