@@ -15,7 +15,7 @@ export const Navbar = () => {
               <ShieldCheck className="h-5 w-5 text-white" />
             </div>
             <span className="text-foreground">
-              Arcanum
+              Abiaxe
             </span>
           </Link>
 
