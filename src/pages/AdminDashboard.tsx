@@ -15,11 +15,8 @@ import {
   ChevronDown,
   ChevronRight,
   UserCheck,
-  Mail,
-  Smartphone,
   RefreshCcw,
   Coins,
-  Bitcoin,
   Clock,
   CheckCircle2,
   FileText,
@@ -40,14 +37,17 @@ import {
 } from "@/components/ui/sidebar";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 const menuItems = [
   { title: "Dashboard", icon: LayoutDashboard, url: "/admin" },
   {
     title: "Manage Order",
     icon: ShoppingBag,
-    // url: "/admin/orders",
     subItems: [
       { title: "All Orders", url: "/admin/orders" },
       { title: "Pending Orders", url: "/admin/orders/pending" },
@@ -57,7 +57,6 @@ const menuItems = [
   {
     title: "Manage P2P",
     icon: Users,
-    // url: "/admin/p2p",
     subItems: [
       { title: "Running Trade", url: "/admin/p2p/running" },
       { title: "Reported Trade", url: "/admin/p2p/reported" },
@@ -94,45 +93,40 @@ const AdminDashboard = () => {
 
   const fetchStats = async () => {
     try {
-      // Fetch user stats
       const { count: totalUsers } = await supabase
-        .from('profiles')
-        .select('*', { count: 'exact', head: true });
+        .from("profiles")
+        .select("*", { count: "exact", head: true });
 
       const { count: verifiedUsers } = await supabase
-        .from('profiles')
-        .select('*', { count: 'exact', head: true })
-        .eq('verified', true);
+        .from("profiles")
+        .select("*", { count: "exact", head: true })
+        .eq("verified", true);
 
-      // Fetch trade stats
       const { count: totalTrades } = await supabase
-        .from('trades')
-        .select('*', { count: 'exact', head: true });
+        .from("trades")
+        .select("*", { count: "exact", head: true });
 
       const { count: runningTrades } = await supabase
-        .from('trades')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'in_progress');
+        .from("trades")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "in_progress");
 
       const { count: completedTrades } = await supabase
-        .from('trades')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'completed');
+        .from("trades")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "completed");
 
-      // Fetch report stats
       const { count: reportedTrades } = await supabase
-        .from('reports')
-        .select('*', { count: 'exact', head: true });
+        .from("reports")
+        .select("*", { count: "exact", head: true });
 
-      // Fetch currency stats
       const { count: totalCurrencies } = await supabase
-        .from('currencies')
-        .select('*', { count: 'exact', head: true });
+        .from("currencies")
+        .select("*", { count: "exact", head: true });
 
-      // Fetch ads stats
       const { count: totalAds } = await supabase
-        .from('ads')
-        .select('*', { count: 'exact', head: true });
+        .from("ads")
+        .select("*", { count: "exact", head: true });
 
       setStats({
         totalUsers: totalUsers || 0,
@@ -145,7 +139,7 @@ const AdminDashboard = () => {
         totalAds: totalAds || 0,
       });
     } catch (error) {
-      console.error('Error fetching stats:', error);
+      console.error("Error fetching stats:", error);
     } finally {
       setLoading(false);
     }
@@ -153,7 +147,9 @@ const AdminDashboard = () => {
 
   const toggleMenu = (title: string) => {
     setOpenMenus((prev) =>
-      prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title]
+      prev.includes(title)
+        ? prev.filter((t) => t !== title)
+        : [...prev, title]
     );
   };
 
@@ -251,8 +247,8 @@ const AdminDashboard = () => {
                           <CollapsibleTrigger className="w-full">
                             <SidebarMenuButton
                               isActive={activeTab === item.title}
-                              onClick={() => setActiveTab(item.title)}
                               className="cursor-pointer"
+                              onClick={() => setActiveTab(item.title)}
                             >
                               <div className="flex items-center justify-between w-full px-3 py-2">
                                 <div className="flex items-center gap-3">
@@ -267,18 +263,21 @@ const AdminDashboard = () => {
                               </div>
                             </SidebarMenuButton>
                           </CollapsibleTrigger>
+
                           <CollapsibleContent className="pl-8 mt-1">
                             {item.subItems.map((subItem) => (
                               <SidebarMenuItem key={subItem.title}>
-                                <SidebarMenuButton
-                                  asChild
-                                  className="cursor-pointer text-sm"
+                                <Link
+                                  to={subItem.url}
+                                  onClick={() => setActiveTab(subItem.title)}
                                 >
-                                  <div className="flex items-center gap-2 px-3 py-2">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground" />
-                                    <span>{subItem.title}</span>
-                                  </div>
-                                </SidebarMenuButton>
+                                  <SidebarMenuButton className="cursor-pointer text-sm w-full">
+                                    <div className="flex items-center gap-2 px-3 py-2">
+                                      <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground" />
+                                      <span>{subItem.title}</span>
+                                    </div>
+                                  </SidebarMenuButton>
+                                </Link>
                               </SidebarMenuItem>
                             ))}
                           </CollapsibleContent>
@@ -286,17 +285,20 @@ const AdminDashboard = () => {
                       </Collapsible>
                     ) : (
                       <SidebarMenuItem key={item.title}>
-                        <SidebarMenuButton
-                          asChild
-                          isActive={activeTab === item.title}
+                        <Link
+                          to={item.url || "#"}
                           onClick={() => setActiveTab(item.title)}
-                          className="cursor-pointer"
                         >
-                          <div className="flex items-center gap-3 px-3 py-2">
-                            <item.icon className="w-5 h-5" />
-                            <span>{item.title}</span>
-                          </div>
-                        </SidebarMenuButton>
+                          <SidebarMenuButton
+                            isActive={activeTab === item.title}
+                            className="cursor-pointer w-full"
+                          >
+                            <div className="flex items-center gap-3 px-3 py-2">
+                              <item.icon className="w-5 h-5" />
+                              <span>{item.title}</span>
+                            </div>
+                          </SidebarMenuButton>
+                        </Link>
                       </SidebarMenuItem>
                     )
                   )}
@@ -340,7 +342,6 @@ const AdminDashboard = () => {
           </header>
 
           <div className="p-4 md:p-6 space-y-6">
-            {/* Main Stats Grid */}
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {mainStats.map((stat) => (
                 <Card
@@ -352,7 +353,9 @@ const AdminDashboard = () => {
                       <p className="text-sm text-muted-foreground mb-2">
                         {stat.title}
                       </p>
-                      <h3 className="text-3xl font-bold mb-1">{stat.value}</h3>
+                      <h3 className="text-3xl font-bold mb-1">
+                        {stat.value}
+                      </h3>
                     </div>
                     <div
                       className={`w-12 h-12 rounded-xl ${stat.bgColor} flex items-center justify-center group-hover:scale-110 transition-transform`}
@@ -365,7 +368,6 @@ const AdminDashboard = () => {
               ))}
             </div>
 
-            {/* P2P Stats */}
             <div>
               <h2 className="text-xl font-bold mb-4">P2P Trading Overview</h2>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -379,7 +381,9 @@ const AdminDashboard = () => {
                         <p className="text-sm text-muted-foreground mb-2">
                           {stat.title}
                         </p>
-                        <h3 className="text-3xl font-bold mb-1">{stat.value}</h3>
+                        <h3 className="text-3xl font-bold mb-1">
+                          {stat.value}
+                        </h3>
                       </div>
                       <div
                         className={`w-12 h-12 rounded-xl ${stat.bgColor} flex items-center justify-center group-hover:scale-110 transition-transform`}
@@ -393,7 +397,6 @@ const AdminDashboard = () => {
               </div>
             </div>
 
-            {/* Quick Actions */}
             <Card className="border overflow-hidden">
               <div className="p-6 border-b border-border bg-muted/30">
                 <h2 className="text-xl font-bold">Quick Actions</h2>
