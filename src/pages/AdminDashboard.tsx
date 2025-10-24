@@ -86,6 +86,7 @@ const AdminDashboard = () => {
     totalAds: 0,
   });
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchStats();
@@ -151,6 +152,22 @@ const AdminDashboard = () => {
         ? prev.filter((t) => t !== title)
         : [...prev, title]
     );
+  };
+
+  const handleLogout = async () => {
+    try {
+      // Supabase sign-out
+      await supabase.auth.signOut();
+
+      // Clear localStorage/session data
+      localStorage.clear();
+      sessionStorage.clear();
+
+      // Redirect to login page
+      navigate("/login");
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
   };
 
   const mainStats = [
@@ -308,7 +325,11 @@ const AdminDashboard = () => {
           </SidebarContent>
 
           <SidebarFooter className="p-4 border-t border-border">
-            <Button variant="outline" className="w-full justify-start gap-3">
+            <Button
+              variant="outline"
+              className="w-full justify-start gap-3"
+              onClick={handleLogout}
+            >
               <LogOut className="w-5 h-5" />
               <span>Logout</span>
             </Button>
