@@ -153,11 +153,11 @@ export default function AuthGlassModal() {
           <div className="p-6 md:p-8 lg:p-10">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <div className="rounded-lg p-2 bg-gradient-to-br from-indigo-600 to-cyan-400">
+                <div className="rounded-lg p-2 bg-gradient-to-br from-red-600 to-red-400">
                   <ShieldCheck className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-white font-bold text-lg">TrustMarket</h3>
+                  <h3 className="text-white font-bold text-lg">ABIAXE</h3>
                   <p className="text-sm text-white/60">
                     {isSignUp ? "Create an account" : "Welcome back"}
                   </p>
