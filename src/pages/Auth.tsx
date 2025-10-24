@@ -135,7 +135,7 @@ export default function AuthGlassModal() {
     <div
       className="min-h-screen flex items-center justify-center p-6"
       style={{
-        backgroundImage: "url('/mnt/data/signup.webp')",
+        backgroundImage: "url('/src/assets/wallpaper-crypto-theme-high-quality-photo-382426897.webp')",
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
@@ -149,7 +149,7 @@ export default function AuthGlassModal() {
           <X className="w-5 h-5 text-white" />
         </button>
 
-        <Card className="mx-auto overflow-hidden rounded-2xl bg-gradient-to-br from-black/70 to-black/50 border border-white/10 shadow-2xl">
+        <Card className="mx-auto overflow-hidden rounded-2xl bg-gradient-to-br from-black/50 to-black/80  border border-white/10 shadow-2xl bg-[rgba(0,0,0,0.35)] ">
           <div className="p-6 md:p-8 lg:p-10">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
@@ -193,7 +193,7 @@ export default function AuthGlassModal() {
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
                       placeholder="John"
-                      className="bg-white/6 text-white placeholder:text-white/40 border border-white/5"
+                      className="bg-[rgba(0,0,0,0.35)]  text-white placeholder:text-white/40 border border-white/5"
                       required
                     />
                   </div>
@@ -203,7 +203,7 @@ export default function AuthGlassModal() {
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
                       placeholder="Doe"
-                      className="bg-white/6 text-white placeholder:text-white/40 border border-white/5"
+                      className="bg-[rgba(0,0,0,0.35)]  text-white placeholder:text-white/40 border border-white/5"
                       required
                     />
                   </div>
@@ -218,7 +218,7 @@ export default function AuthGlassModal() {
                   onChange={(e) => setEmail(e.target.value)}
                   type="email"
                   placeholder="Enter your email"
-                  className="bg-white/6 text-white placeholder:text-white/40 border border-white/5"
+                  className="bg-[rgba(0,0,0,0.35)]  text-white placeholder:text-white/40 border border-white/5"
                   required
                 />
               </div>
@@ -230,7 +230,7 @@ export default function AuthGlassModal() {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="(775) 351-6501"
-                    className="bg-white/6 text-white placeholder:text-white/40 border border-white/5"
+                    className="bg-[rgba(0,0,0,0.35)]  text-white placeholder:text-white/40 border border-white/5"
                   />
                 </div>
               )}
@@ -243,7 +243,7 @@ export default function AuthGlassModal() {
                   onChange={(e) => setPassword(e.target.value)}
                   type="password"
                   placeholder="••••••••"
-                  className="bg-white/6 text-white placeholder:text-white/40 border border-white/5"
+                  className="bg-[rgba(0,0,0,0.35)]  text-white placeholder:text-white/40 border border-white/5"
                   required
                 />
               </div>
@@ -257,7 +257,7 @@ export default function AuthGlassModal() {
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     type="password"
                     placeholder="••••••••"
-                    className="bg-white/6 text-white placeholder:text-white/40 border border-white/5"
+                    className="bg-[rgba(0,0,0,0.35)]  text-white placeholder:text-white/40 border border-white/5"
                     required
                   />
                 </div>
