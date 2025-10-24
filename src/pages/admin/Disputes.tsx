@@ -1,15 +1,40 @@
+import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+
+interface Dispute {
+  id: string;
+  dispute_number: string;
+  trade_id: string;
+  reason: string;
+  status: string;
+  created_at: string;
+}
 
 const Disputes = () => {
-  const disputes = [
-    { id: "#DIS001", tradeId: "#TRD089", reporter: "Alice Brown", reported: "Bob Wilson", reason: "Payment not received", status: "Open", priority: "High", date: "2025-01-14" },
-    { id: "#DIS002", tradeId: "#TRD092", reporter: "Charlie Davis", reported: "Diana Miller", reason: "Wrong amount", status: "Under Review", priority: "Medium", date: "2025-01-13" },
-    { id: "#DIS003", tradeId: "#TRD085", reporter: "Eve Johnson", reported: "Frank White", reason: "Delayed release", status: "Resolved", priority: "Low", date: "2025-01-12" },
-  ];
+  const [disputes, setDisputes] = useState<Dispute[]>([]);
+  const [stats, setStats] = useState({ total: 0, open: 0, underReview: 0, resolved: 0 });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data } = await supabase.from('disputes').select('*').order('created_at', { ascending: false });
+      setDisputes(data || []);
+      
+      const { count: total } = await supabase.from('disputes').select('*', { count: 'exact', head: true });
+      const { count: open } = await supabase.from('disputes').select('*', { count: 'exact', head: true }).eq('status', 'open');
+      const { count: underReview } = await supabase.from('disputes').select('*', { count: 'exact', head: true }).eq('status', 'under_review');
+      const { count: resolved } = await supabase.from('disputes').select('*', { count: 'exact', head: true }).eq('status', 'resolved');
+      
+      setStats({ total: total || 0, open: open || 0, underReview: underReview || 0, resolved: resolved || 0 });
+      setLoading(false);
+    };
+    fetchData();
+  }, []);
 
   return (
     <AdminLayout>
@@ -19,79 +44,51 @@ const Disputes = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <Card className="p-6">
             <div className="text-sm text-muted-foreground mb-2">Total Disputes</div>
-            <div className="text-3xl font-bold">87</div>
+            <div className="text-3xl font-bold">{stats.total}</div>
           </Card>
           <Card className="p-6">
             <div className="text-sm text-muted-foreground mb-2">Open</div>
-            <div className="text-3xl font-bold text-destructive">5</div>
+            <div className="text-3xl font-bold text-destructive">{stats.open}</div>
           </Card>
           <Card className="p-6">
             <div className="text-sm text-muted-foreground mb-2">Under Review</div>
-            <div className="text-3xl font-bold text-warning">8</div>
+            <div className="text-3xl font-bold text-warning">{stats.underReview}</div>
           </Card>
           <Card className="p-6">
             <div className="text-sm text-muted-foreground mb-2">Resolved</div>
-            <div className="text-3xl font-bold text-success">74</div>
+            <div className="text-3xl font-bold text-success">{stats.resolved}</div>
           </Card>
         </div>
 
         <Card className="p-6">
           <h2 className="text-xl font-bold mb-4">Active Disputes</h2>
+          {loading ? <div className="text-center py-8">Loading...</div> : disputes.length === 0 ? 
+            <div className="text-center py-8 text-muted-foreground">No disputes found</div> : (
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Dispute ID</TableHead>
                 <TableHead>Trade ID</TableHead>
-                <TableHead>Reporter</TableHead>
-                <TableHead>Reported</TableHead>
                 <TableHead>Reason</TableHead>
-                <TableHead>Priority</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Date</TableHead>
+                <TableHead>Created</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {disputes.map((dispute) => (
-                <TableRow key={dispute.id}>
-                  <TableCell className="font-mono">{dispute.id}</TableCell>
-                  <TableCell className="font-mono">{dispute.tradeId}</TableCell>
-                  <TableCell>{dispute.reporter}</TableCell>
-                  <TableCell>{dispute.reported}</TableCell>
-                  <TableCell>{dispute.reason}</TableCell>
-                  <TableCell>
-                    <Badge 
-                      variant={
-                        dispute.priority === "High" ? "destructive" :
-                        dispute.priority === "Medium" ? "secondary" :
-                        "outline"
-                      }
-                    >
-                      {dispute.priority}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge 
-                      variant={
-                        dispute.status === "Open" ? "destructive" :
-                        dispute.status === "Under Review" ? "secondary" :
-                        "default"
-                      }
-                    >
-                      {dispute.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{dispute.date}</TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm">Review</Button>
-                      <Button size="sm">Resolve</Button>
-                    </div>
-                  </TableCell>
+              {disputes.map((d) => (
+                <TableRow key={d.id}>
+                  <TableCell className="font-mono">{d.dispute_number}</TableCell>
+                  <TableCell className="font-mono">{d.trade_id}</TableCell>
+                  <TableCell className="max-w-xs truncate">{d.reason}</TableCell>
+                  <TableCell><Badge variant={d.status === 'open' ? 'destructive' : d.status === 'resolved' ? 'default' : 'secondary'}>{d.status}</Badge></TableCell>
+                  <TableCell>{new Date(d.created_at).toLocaleDateString()}</TableCell>
+                  <TableCell><Button size="sm">Review</Button></TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
+          )}
         </Card>
       </div>
     </AdminLayout>

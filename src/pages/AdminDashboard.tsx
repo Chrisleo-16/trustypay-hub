@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import {
   LayoutDashboard,
   ShoppingBag,
@@ -75,6 +76,80 @@ const menuItems = [
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("Dashboard");
   const [openMenus, setOpenMenus] = useState<string[]>(["Manage P2P"]);
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    verifiedUsers: 0,
+    totalTrades: 0,
+    totalCurrencies: 0,
+    runningTrades: 0,
+    completedTrades: 0,
+    reportedTrades: 0,
+    totalAds: 0,
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const fetchStats = async () => {
+    try {
+      // Fetch user stats
+      const { count: totalUsers } = await supabase
+        .from('profiles')
+        .select('*', { count: 'exact', head: true });
+
+      const { count: verifiedUsers } = await supabase
+        .from('profiles')
+        .select('*', { count: 'exact', head: true })
+        .eq('verified', true);
+
+      // Fetch trade stats
+      const { count: totalTrades } = await supabase
+        .from('trades')
+        .select('*', { count: 'exact', head: true });
+
+      const { count: runningTrades } = await supabase
+        .from('trades')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'in_progress');
+
+      const { count: completedTrades } = await supabase
+        .from('trades')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'completed');
+
+      // Fetch report stats
+      const { count: reportedTrades } = await supabase
+        .from('reports')
+        .select('*', { count: 'exact', head: true });
+
+      // Fetch currency stats
+      const { count: totalCurrencies } = await supabase
+        .from('currencies')
+        .select('*', { count: 'exact', head: true });
+
+      // Fetch ads stats
+      const { count: totalAds } = await supabase
+        .from('ads')
+        .select('*', { count: 'exact', head: true });
+
+      setStats({
+        totalUsers: totalUsers || 0,
+        verifiedUsers: verifiedUsers || 0,
+        totalTrades: totalTrades || 0,
+        totalCurrencies: totalCurrencies || 0,
+        runningTrades: runningTrades || 0,
+        completedTrades: completedTrades || 0,
+        reportedTrades: reportedTrades || 0,
+        totalAds: totalAds || 0,
+      });
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const toggleMenu = (title: string) => {
     setOpenMenus((prev) =>
@@ -85,93 +160,63 @@ const AdminDashboard = () => {
   const mainStats = [
     {
       title: "Total Users",
-      value: "2,756",
+      value: loading ? "..." : stats.totalUsers.toString(),
       icon: Users,
       color: "text-primary",
       bgColor: "bg-primary/10",
     },
     {
-      title: "Active Users",
-      value: "2,473",
+      title: "Verified Users",
+      value: loading ? "..." : stats.verifiedUsers.toString(),
       icon: UserCheck,
       color: "text-success",
       bgColor: "bg-success/10",
     },
     {
-      title: "Email Unverified Users",
-      value: "244",
-      icon: Mail,
-      color: "text-warning",
-      bgColor: "bg-warning/10",
-    },
-    {
-      title: "Mobile Unverified Users",
-      value: "0",
-      icon: Smartphone,
-      color: "text-danger",
-      bgColor: "bg-danger/10",
-    },
-    {
-      title: "Total Trade",
-      value: "5,162",
+      title: "Total Trades",
+      value: loading ? "..." : stats.totalTrades.toString(),
       icon: RefreshCcw,
       color: "text-accent",
       bgColor: "bg-accent/10",
     },
     {
       title: "Total Currencies",
-      value: "44",
+      value: loading ? "..." : stats.totalCurrencies.toString(),
       icon: Coins,
       color: "text-primary",
       bgColor: "bg-primary/10",
-    },
-    {
-      title: "Total Crypto Currencies",
-      value: "14",
-      icon: Bitcoin,
-      color: "text-accent",
-      bgColor: "bg-accent/10",
     },
   ];
 
   const p2pStats = [
     {
       title: "P2P Running Trade",
-      value: "48",
+      value: loading ? "..." : stats.runningTrades.toString(),
       icon: Clock,
       color: "text-warning",
       bgColor: "bg-warning/10",
     },
     {
       title: "P2P Completed Trade",
-      value: "5,114",
+      value: loading ? "..." : stats.completedTrades.toString(),
       icon: CheckCircle2,
       color: "text-success",
       bgColor: "bg-success/10",
     },
     {
       title: "P2P Reported Trade",
-      value: "23",
+      value: loading ? "..." : stats.reportedTrades.toString(),
       icon: FileText,
       color: "text-danger",
       bgColor: "bg-danger/10",
     },
     {
       title: "P2P Total Ad",
-      value: "355",
+      value: loading ? "..." : stats.totalAds.toString(),
       icon: ShoppingBag,
       color: "text-accent",
       bgColor: "bg-accent/10",
     },
-  ];
-
-  const orderSummary = [
-    { pair: "TRX_USDT", amount: "38.1137 TRX" },
-    { pair: "SHIB_USDT", amount: "0.2000 SHIB" },
-    { pair: "ETH_USDT", amount: "0.0019 ETH" },
-    { pair: "BTC_USD", amount: "0.0011 BTC" },
-    { pair: "SOL_USDT", amount: "0.0450 SOL" },
-    { pair: "ADA_USDT", amount: "12.3400 ADA" },
   ];
 
   return (
@@ -348,33 +393,40 @@ const AdminDashboard = () => {
               </div>
             </div>
 
-            {/* Order Summary */}
+            {/* Quick Actions */}
             <Card className="border overflow-hidden">
               <div className="p-6 border-b border-border bg-muted/30">
-                <h2 className="text-xl font-bold">Order Summary</h2>
+                <h2 className="text-xl font-bold">Quick Actions</h2>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Order summary presents visual & listing data of order,
-                  categories by pair, excluding canceled orders & scroll below to
-                  show all pair.
+                  Common administrative actions for platform management.
                 </p>
               </div>
               <div className="p-6">
                 <div className="grid gap-3">
-                  <div className="grid grid-cols-2 gap-4 pb-3 border-b font-semibold text-muted-foreground">
-                    <div>Pair</div>
-                    <div className="text-right">Amount</div>
-                  </div>
-                  {orderSummary.map((order, index) => (
-                    <div
-                      key={index}
-                      className="grid grid-cols-2 gap-4 py-3 border-b last:border-0 hover:bg-muted/50 transition-colors rounded-lg px-3"
-                    >
-                      <div className="font-medium">{order.pair}</div>
-                      <div className="text-right font-semibold text-accent">
-                        {order.amount}
-                      </div>
-                    </div>
-                  ))}
+                  <Link to="/admin/users">
+                    <Button className="w-full justify-start" variant="outline">
+                      <Users className="mr-2 h-4 w-4" />
+                      Manage Users
+                    </Button>
+                  </Link>
+                  <Link to="/admin/trades">
+                    <Button className="w-full justify-start" variant="outline">
+                      <RefreshCcw className="mr-2 h-4 w-4" />
+                      View All Trades
+                    </Button>
+                  </Link>
+                  <Link to="/admin/disputes">
+                    <Button className="w-full justify-start" variant="outline">
+                      <AlertCircle className="mr-2 h-4 w-4" />
+                      Handle Disputes
+                    </Button>
+                  </Link>
+                  <Link to="/admin/settings">
+                    <Button className="w-full justify-start" variant="outline">
+                      <Settings className="mr-2 h-4 w-4" />
+                      Platform Settings
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </Card>
