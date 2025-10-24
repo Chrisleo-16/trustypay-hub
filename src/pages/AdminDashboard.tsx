@@ -164,7 +164,7 @@ const AdminDashboard = () => {
       sessionStorage.clear();
 
       // Redirect to login page
-      navigate("/login");
+      navigate("/");
     } catch (error) {
       console.error("Error during logout:", error);
     }
