@@ -21,20 +21,40 @@ const Auth = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check if user is already logged in
-    const checkUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        navigate("/");
+    const checkSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (session?.user) {
+        // ✅ Always check role before redirect
+        const { data: roleData, error: roleError } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", session.user.id)
+          .maybeSingle();
+
+        if (roleError) {
+          console.error("Error fetching role:", roleError.message);
+          return;
+        }
+
+        // Redirect based on role
+        if (roleData?.role === "admin") {
+          navigate("/admin", { replace: true });
+        } else {
+          navigate("/", { replace: true });
+        }
       }
     };
-    checkUser();
+
+    checkSession();
   }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
       if (isSignUp) {
         if (password !== confirmPassword) {
@@ -51,9 +71,7 @@ const Auth = () => {
           password,
           options: {
             emailRedirectTo: `${window.location.origin}/`,
-            data: {
-              full_name: fullName,
-            },
+            data: { full_name: fullName },
           },
         });
 
@@ -61,9 +79,9 @@ const Auth = () => {
 
         toast({
           title: "Account created!",
-          description: "You've been signed up successfully.",
+          description: "Please verify your email to continue.",
         });
-        
+
         navigate("/");
       } else {
         const { data, error } = await supabase.auth.signInWithPassword({
@@ -73,22 +91,39 @@ const Auth = () => {
 
         if (error) throw error;
 
-        // Check if user is admin and redirect accordingly
-        if (data.user) {
-          const { data: roleData } = await supabase
-            .from('user_roles')
-            .select('role')
-            .eq('user_id', data.user.id)
-            .eq('role', 'admin')
-            .maybeSingle();
+        const user = data?.user;
 
+        if (!user) {
+          throw new Error("User not found after login.");
+        }
+
+        // ✅ Fetch user role immediately
+        const { data: roleData, error: roleError } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        if (roleError) {
+          console.error("Role fetch error:", roleError.message);
           toast({
-            title: "Welcome back!",
-            description: "You've been signed in successfully.",
+            title: "Login failed",
+            description: "Unable to verify role.",
+            variant: "destructive",
           });
+          return;
+        }
 
-          // Redirect to admin dashboard if admin, otherwise to home
-          navigate(roleData ? "/admin" : "/");
+        toast({
+          title: "Welcome back!",
+          description: "You've been signed in successfully.",
+        });
+
+        // ✅ Redirect based on role
+        if (roleData?.role === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/");
         }
       }
     } catch (error: any) {
@@ -106,7 +141,10 @@ const Auth = () => {
     <div className="min-h-screen bg-gradient-primary flex items-center justify-center p-4">
       <Card className="w-full max-w-md p-8 animate-scale-in">
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-2 font-bold text-2xl mb-2">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 font-bold text-2xl mb-2"
+          >
             <div className="rounded-lg bg-gradient-primary p-2">
               <ShieldCheck className="h-6 w-6 text-white" />
             </div>
@@ -182,7 +220,7 @@ const Auth = () => {
             size="lg"
             disabled={loading}
           >
-            {loading ? "Please wait..." : (isSignUp ? "Sign Up" : "Sign In")}
+            {loading ? "Please wait..." : isSignUp ? "Sign Up" : "Sign In"}
           </Button>
         </form>
 
