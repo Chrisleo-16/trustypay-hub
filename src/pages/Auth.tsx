@@ -8,6 +8,7 @@ import { ShieldCheck, X } from "lucide-react";
 import { FaGoogle, FaApple } from "react-icons/fa";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import cryptoImage from "@/assets/wallpaper-crypto-theme-high-quality-photo-382426897.webp"
 
 export default function AuthGlassModal() {
   const navigate = useNavigate();
@@ -135,7 +136,7 @@ export default function AuthGlassModal() {
     <div
       className="min-h-screen flex items-center justify-center p-6"
       style={{
-        backgroundImage: "url('/public/wallpaper-crypto-theme-high-quality-photo-382426897.webp')",
+        backgroundImage: `url(${cryptoImage})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
