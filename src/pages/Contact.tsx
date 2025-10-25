@@ -5,16 +5,56 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Mail, MessageSquare, Phone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 const Contact = () => {
   const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Message sent!",
-      description: "We'll get back to you within 24 hours.",
-    });
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/sendEmail", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        toast({
+          title: "✅ Message sent!",
+          description: "We'll get back to you soon via email.",
+        });
+        setForm({ name: "", email: "", subject: "", message: "" });
+      } else {
+        toast({
+          title: "❌ Error",
+          description: "Failed to send message. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (err) {
+      toast({
+        title: "❌ Failed to send",
+        description: "Please check your connection and try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -62,27 +102,35 @@ const Contact = () => {
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <label className="text-sm font-medium mb-2 block">Name</label>
-                  <Input placeholder="Your name" required />
+                  <Input name="name" value={form.name} onChange={handleChange} placeholder="Your name" required />
                 </div>
                 <div>
                   <label className="text-sm font-medium mb-2 block">Email</label>
-                  <Input type="email" placeholder="your@email.com" required />
+                  <Input name="email" type="email" value={form.email} onChange={handleChange} placeholder="your@email.com" required />
                 </div>
               </div>
               <div>
                 <label className="text-sm font-medium mb-2 block">Subject</label>
-                <Input placeholder="How can we help?" required />
+                <Input name="subject" value={form.subject} onChange={handleChange} placeholder="How can we help?" required />
               </div>
               <div>
                 <label className="text-sm font-medium mb-2 block">Message</label>
                 <Textarea 
+                  name="message"
+                  value={form.message}
+                  onChange={handleChange}
                   placeholder="Tell us more about your inquiry..." 
                   rows={6}
                   required 
                 />
               </div>
-              <Button type="submit" size="lg" className="w-full bg-primary hover:bg-primary-hover">
-                Send Message
+              <Button
+                type="submit"
+                size="lg"
+                className="w-full bg-primary hover:bg-primary-hover"
+                disabled={loading}
+              >
+                {loading ? "Sending..." : "Send Message"}
               </Button>
             </form>
           </Card>
