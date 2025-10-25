@@ -37,7 +37,7 @@ export const Navbar = () => {
 
           <div className="hidden md:flex items-center gap-3">
             <Link to="/auth">
-              <Button variant="ghost">Sign In</Button>
+              <Button variant="ghost" className="text-white border-2 border-red ">Sign In</Button>
             </Link>
             <Link to="/auth?mode=signup">
               <Button className="bg-primary hover:bg-primary-hover">
@@ -48,7 +48,7 @@ export const Navbar = () => {
 
           {/* Mobile menu button */}
           <button
-            className="md:hidden"
+            className="md:hidden text-white"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             <Menu className="h-6 w-6" />
