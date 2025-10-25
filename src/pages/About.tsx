@@ -9,7 +9,7 @@ const About = () => {
       
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">About Arcanum</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-6">About Abiaxe</h1>
           <p className="text-xl text-muted-foreground mb-12">
             We're building the future of secure digital asset trading. Our mission is to make cryptocurrency trading accessible, secure, and transparent for everyone.
           </p>
@@ -59,13 +59,13 @@ const About = () => {
           <div className="prose prose-lg max-w-none">
             <h2 className="text-3xl font-bold mb-4">Our Story</h2>
             <p className="text-muted-foreground mb-4">
-              Founded in 2024, Arcanum was born from the frustration of dealing with unreliable P2P platforms. We saw traders losing money due to scams, delayed payments, and poor dispute resolution.
+              Founded in 2024, Abiaxe was born from the frustration of dealing with unreliable P2P platforms. We saw traders losing money due to scams, delayed payments, and poor dispute resolution.
             </p>
             <p className="text-muted-foreground mb-4">
-              We built Arcanum to solve these problems. With advanced escrow protection, real-time verification, and 24/7 customer support, we've created a platform where trust is built into every transaction.
+              We built Abiaxe to solve these problems. With advanced escrow protection, real-time verification, and 24/7 customer support, we've created a platform where trust is built into every transaction.
             </p>
             <p className="text-muted-foreground">
-              Today, thousands of traders use Arcanum daily to buy and sell cryptocurrencies safely. Join us in building the future of decentralized finance.
+              Today, thousands of traders use Abiaxe daily to buy and sell cryptocurrencies safely. Join us in building the future of decentralized finance.
             </p>
           </div>
         </div>

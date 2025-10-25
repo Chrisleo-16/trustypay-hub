@@ -55,7 +55,7 @@ const Index = () => {
               <span className="text-sm text-primary">WELCOME TO THE FUTURE</span>
             </div>
             <h1 className="text-5xl md:text-7xl font-bold mb-6">
-              <span className="text-secondary">Secure Your Digital </span><br />
+              <span className="text-white">Secure Your Digital </span><br />
               <span className="text-primary">Financial Future.</span>
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto">
@@ -298,7 +298,7 @@ const Index = () => {
             <span className="text-primary text-sm font-bold tracking-wider">START TODAY</span>
             <h2 className="text-4xl md:text-5xl font-bold mt-4 mb-6 text-foreground">Unlock Your Trading Potential</h2>
             <p className="text-xl text-muted-foreground mb-8">
-              Join thousands of traders who trust Arcanum for secure, fast, and profitable cryptocurrency trading
+              Join thousands of traders who trust Abiaxe for secure, fast, and profitable cryptocurrency trading
             </p>
 
             <div className="grid md:grid-cols-3 gap-6 mt-12">
@@ -341,7 +341,7 @@ const Index = () => {
                       ))}
                     </div>
                     <p className="text-lg mb-6 text-muted-foreground">
-                      "Arcanum has completely transformed how I trade crypto. The security features give me peace of mind, and the interface is incredibly intuitive. Best platform I've used!"
+                      "Abiaxe has completely transformed how I trade crypto. The security features give me peace of mind, and the interface is incredibly intuitive. Best platform I've used!"
                     </p>
                     <div className="flex items-center gap-4">
                       <img 
@@ -365,7 +365,7 @@ const Index = () => {
                       ))}
                     </div>
                     <p className="text-lg mb-6 text-muted-foreground">
-                      "I was hesitant about P2P trading until I found Arcanum. The escrow system works flawlessly, and I've never felt safer trading cryptocurrency online."
+                      "I was hesitant about P2P trading until I found Abiaxe. The escrow system works flawlessly, and I've never felt safer trading cryptocurrency online."
                     </p>
                     <div className="flex items-center gap-4">
                       <img 
@@ -417,7 +417,7 @@ const Index = () => {
             <span className="text-primary text-sm font-bold tracking-wider">FAQ</span>
             <h2 className="text-4xl md:text-5xl font-bold mt-4 mb-6 text-foreground">Your Questions Answered</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Everything you need to know about trading on Arcanum
+              Everything you need to know about trading on Abiaxe
             </p>
           </div>
 
@@ -428,7 +428,7 @@ const Index = () => {
                   What is P2P cryptocurrency trading?
                 </AccordionTrigger>
                 <AccordionContent className="text-foreground">
-                  P2P (peer-to-peer) cryptocurrency trading allows you to buy and sell crypto directly with other users without an intermediary. Arcanum provides the secure platform and escrow service to ensure safe transactions.
+                  P2P (peer-to-peer) cryptocurrency trading allows you to buy and sell crypto directly with other users without an intermediary. Abiaxe provides the secure platform and escrow service to ensure safe transactions.
                 </AccordionContent>
               </AccordionItem>
 
@@ -446,13 +446,13 @@ const Index = () => {
                   Is cryptocurrency trading risky?
                 </AccordionTrigger>
                 <AccordionContent className="text-foreground">
-                  All investments carry risk, but Arcanum minimizes trading risks through escrow protection, user verification, and 24/7 security monitoring. We recommend starting small and only trading what you can afford to lose.
+                  All investments carry risk, but Abiaxe minimizes trading risks through escrow protection, user verification, and 24/7 security monitoring. We recommend starting small and only trading what you can afford to lose.
                 </AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-4">
                 <AccordionTrigger className="text-left text-lg text-foreground">
-                  What fees does Arcanum charge?
+                  What fees does Abiaxe charge?
                 </AccordionTrigger>
                 <AccordionContent className="text-foreground">
                   We charge a competitive 1% transaction fee on completed trades. There are no hidden fees, monthly subscriptions, or withdrawal charges. What you see is what you pay.
@@ -514,7 +514,7 @@ const Index = () => {
                     </div>
                     <div>
                       <div className="font-bold">Email Us</div>
-                      <div className="text-muted-foreground">support@arcanum.com</div>
+                      <div className="text-muted-foreground">support@Abiaxe.com</div>
                     </div>
                   </div>
 
@@ -579,7 +579,7 @@ const Index = () => {
                   <ShieldCheck className="h-5 w-5 text-white" />
                 </div>
                 <span className="text-foreground">
-                  Arcanum
+                  Abiaxe
                 </span>
               </div>
               <p className="text-sm text-muted-foreground">
@@ -612,7 +612,7 @@ const Index = () => {
             </div>
           </div>
           <div className="border-t border-border mt-8 pt-8 text-center text-sm text-muted-foreground">
-            © 2025 Arcanum. All rights reserved.
+            © 2025 Abiaxe. All rights reserved.
           </div>
         </div>
       </footer>
