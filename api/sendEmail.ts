@@ -17,7 +17,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     // Send to Abiaxe support inbox
     await resend.emails.send({
-      from: "Abiaxe Contact <support@abiaxe.com>",
+      from: "Acme <onboarding@resend.dev>",
       to: "support@abiaxe.com",
       subject: `📩 New Contact Message: ${subject}`,
       html: `
@@ -31,7 +31,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // Send confirmation email to the user
     await resend.emails.send({
-      from: "Abiaxe Support <support@abiaxe.com>",
+      from: "Acme <onboarding@resend.dev>",
       to: email,
       subject: "✅ We’ve received your message",
       html: `
@@ -44,6 +44,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
 
     res.status(200).json({ success: true, message: "Emails sent successfully!" });
+    console.log("Request body:", req.body);
+    console.log("Using API key:", process.env.RESEND_API_KEY ? "✅ Loaded" : "❌ Missing");
+
   } catch (error: any) {
     console.error("Error sending email:", error);
     res.status(500).json({ success: false, message: error.message });
