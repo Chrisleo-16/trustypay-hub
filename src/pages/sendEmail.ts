@@ -12,7 +12,7 @@ export async function sendEmail(payload: EmailPayload): Promise<{ success: boole
   const { name, email, subject, message } = payload;
 
   try {
-    const resend = new Resend(import.meta.env.RESEND_API_KEY);
+    const resend = new Resend(import.meta.env.VITE_RESEND_API_KEY);
 
     // Send to Abiaxe support inbox
     await resend.emails.send({
