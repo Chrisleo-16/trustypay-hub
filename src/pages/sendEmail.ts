@@ -1,19 +1,19 @@
+// src/utils/sendEmail.ts
 import { Resend } from "resend";
 
-export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ message: "Method not allowed" });
-  }
+export interface EmailPayload {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}
 
-  const { name, email, subject, message } = req.body;
-
-  if (!name || !email || !subject || !message) {
-    return res.status(400).json({ message: "Missing required fields" });
-  }
-
-  const resend = new Resend(process.env.RESEND_API_KEY);
+export async function sendEmail(payload: EmailPayload): Promise<{ success: boolean; message: string }> {
+  const { name, email, subject, message } = payload;
 
   try {
+    const resend = new Resend(import.meta.env.RESEND_API_KEY);
+
     // Send to Abiaxe support inbox
     await resend.emails.send({
       from: "Abiaxe Contact <support@abiaxe.com>",
@@ -28,7 +28,7 @@ export default async function handler(req, res) {
       `,
     });
 
-    // Send confirmation email back to the customer
+    // Send confirmation email to the user
     await resend.emails.send({
       from: "Abiaxe Support <support@abiaxe.com>",
       to: email,
@@ -42,9 +42,9 @@ export default async function handler(req, res) {
       `,
     });
 
-    return res.status(200).json({ success: true });
-  } catch (err) {
-    console.error("Error sending email:", err);
-    return res.status(500).json({ success: false, error: err.message });
+    return { success: true, message: "Emails sent successfully!" };
+  } catch (error: any) {
+    console.error("Error sending email:", error);
+    return { success: false, message: error.message || "Failed to send email" };
   }
 }
