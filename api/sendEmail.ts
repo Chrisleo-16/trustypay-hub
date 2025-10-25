@@ -12,7 +12,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ message: "Missing required fields" });
   }
 
-  const resend = new Resend(process.env.VITE_RESEND_API_KEY);
+  const resend = new Resend(process.env.RESEND_API_KEY);
 
   try {
     // Send to Abiaxe support inbox
