@@ -242,7 +242,7 @@ const AdminDashboard = () => {
                 <Activity className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h2 className="font-bold text-lg">SecureSwap</h2>
+                <h2 className="font-bold text-lg">Abiaxe</h2>
                 <p className="text-xs text-muted-foreground">Admin Panel</p>
               </div>
             </div>
