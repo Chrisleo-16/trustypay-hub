@@ -6,13 +6,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { Mail, MessageSquare, Phone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
-import { sendEmail } from "@/pages/sendEmail"; // ✅ Import your resend function
-import type { EmailPayload } from "@/pages/sendEmail"; // ✅ Import types
+
+interface ContactForm {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}
 
 const Contact = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState<EmailPayload>({
+  const [form, setForm] = useState<ContactForm>({
     name: "",
     email: "",
     subject: "",
@@ -31,9 +36,15 @@ const Contact = () => {
     setLoading(true);
 
     try {
-      const result = await sendEmail(form); // ✅ Call the function directly
+      const res = await fetch("/api/sendEmail", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
 
-      if (result.success) {
+      const data = await res.json();
+
+      if (data.success) {
         toast({
           title: "✅ Message sent!",
           description: "We'll get back to you soon via email.",
@@ -42,7 +53,7 @@ const Contact = () => {
       } else {
         toast({
           title: "❌ Error",
-          description: result.message || "Failed to send message.",
+          description: data.message || "Failed to send message.",
           variant: "destructive",
         });
       }
