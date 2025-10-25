@@ -48,6 +48,32 @@ const App = () => {
       setLoading(false);
     }
   }, []);
+const testSendEmail = async () => {
+  try {
+    const response = await fetch("/api/sendEmail", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: "Tester",
+        email: "test@example.com",
+        subject: "Vercel API Route Test",
+        message: "This is a test message from the testSendEmail button.",
+      }),
+    });
+
+    const data = await response.json();
+    console.log("✅ API Response:", data);
+
+    if (data.success) {
+      alert("✅ Test email sent successfully!");
+    } else {
+      alert("❌ Failed to send email: " + data.message);
+    }
+  } catch (error: any) {
+    console.error("Error testing email:", error);
+    alert("⚠️ Network or server error: " + error.message);
+  }
+};
 
   const handlePreloaderComplete = () => {
     sessionStorage.setItem("preloader-shown", "true");
