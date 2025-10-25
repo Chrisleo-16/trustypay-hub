@@ -37,7 +37,7 @@ export const Navbar = () => {
 
           <div className="hidden md:flex items-center gap-3">
             <Link to="/auth">
-              <Button variant="ghost" className="text-white border-2 border-red ">Sign In</Button>
+              <Button variant="ghost" className="text-primary border-2 border-primary hover:text-white ">Sign In</Button>
             </Link>
             <Link to="/auth?mode=signup">
               <Button className="bg-primary hover:bg-primary-hover">
