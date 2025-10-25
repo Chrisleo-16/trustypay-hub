@@ -6,34 +6,34 @@ import { Textarea } from "@/components/ui/textarea";
 import { Mail, MessageSquare, Phone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { sendEmail } from "@/pages/sendEmail"; // ✅ Import your resend function
+import type { EmailPayload } from "@/pages/sendEmail"; // ✅ Import types
 
 const Contact = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<EmailPayload>({
     name: "",
     email: "",
     subject: "",
     message: "",
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const res = await fetch("/api/sendEmail", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
+      const result = await sendEmail(form); // ✅ Call the function directly
 
-      const data = await res.json();
-      if (data.success) {
+      if (result.success) {
         toast({
           title: "✅ Message sent!",
           description: "We'll get back to you soon via email.",
@@ -42,14 +42,14 @@ const Contact = () => {
       } else {
         toast({
           title: "❌ Error",
-          description: "Failed to send message. Please try again.",
+          description: result.message || "Failed to send message.",
           variant: "destructive",
         });
       }
-    } catch (err) {
+    } catch (error: any) {
       toast({
         title: "❌ Failed to send",
-        description: "Please check your connection and try again.",
+        description: error.message || "Please check your connection and try again.",
         variant: "destructive",
       });
     } finally {
@@ -60,7 +60,7 @@ const Contact = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
+
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
@@ -102,26 +102,45 @@ const Contact = () => {
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <label className="text-sm font-medium mb-2 block">Name</label>
-                  <Input name="name" value={form.name} onChange={handleChange} placeholder="Your name" required />
+                  <Input
+                    name="name"
+                    value={form.name}
+                    onChange={handleChange}
+                    placeholder="Your name"
+                    required
+                  />
                 </div>
                 <div>
                   <label className="text-sm font-medium mb-2 block">Email</label>
-                  <Input name="email" type="email" value={form.email} onChange={handleChange} placeholder="your@email.com" required />
+                  <Input
+                    name="email"
+                    type="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    placeholder="your@email.com"
+                    required
+                  />
                 </div>
               </div>
               <div>
                 <label className="text-sm font-medium mb-2 block">Subject</label>
-                <Input name="subject" value={form.subject} onChange={handleChange} placeholder="How can we help?" required />
+                <Input
+                  name="subject"
+                  value={form.subject}
+                  onChange={handleChange}
+                  placeholder="How can we help?"
+                  required
+                />
               </div>
               <div>
                 <label className="text-sm font-medium mb-2 block">Message</label>
-                <Textarea 
+                <Textarea
                   name="message"
                   value={form.message}
                   onChange={handleChange}
-                  placeholder="Tell us more about your inquiry..." 
+                  placeholder="Tell us more about your inquiry..."
                   rows={6}
-                  required 
+                  required
                 />
               </div>
               <Button
