@@ -226,7 +226,7 @@ export default function AuthGlassModal() {
 
               {isSignUp && (
                 <div>
-                  <Label className="text-white/80">Phone (optional)</Label>
+                  <Label className="text-white/80">Phone</Label>
                   <Input
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
