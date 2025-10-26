@@ -150,7 +150,7 @@ const P2PMarket = () => {
         title: activeTab === 'buy' ? "Funds Transferred!" : "Payment Received!",
         description: "Please confirm to continue.",
       });
-    }, 5000);
+    }, 900000);
 
     // Start countdown if selling
     if (activeTab === 'sell') {
@@ -162,7 +162,7 @@ const P2PMarket = () => {
           }
           return prev - 1;
         });
-      }, 1000);
+      }, 900000);
     }
   };
 
@@ -177,8 +177,8 @@ const P2PMarket = () => {
       setShowModal(false);
       setOrderStage('listing');
       setAmount("");
-      setCountdown(900);
-    }, 200000);
+      setCountdown(27000);
+    }, 900000);
   };
 
   const formatTime = (seconds: number) => {
