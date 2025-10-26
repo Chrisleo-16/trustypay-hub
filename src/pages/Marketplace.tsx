@@ -178,7 +178,7 @@ const P2PMarket = () => {
       setOrderStage('listing');
       setAmount("");
       setCountdown(900);
-    }, 3000);
+    }, 200000);
   };
 
   const formatTime = (seconds: number) => {
