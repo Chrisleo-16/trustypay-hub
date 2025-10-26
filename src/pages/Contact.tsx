@@ -26,7 +26,7 @@ const Contact = () => {
   });
 
   // ✅ Formspree setup
-  const [state, handleSubmitFormspree] = useForm("https://formspree.io/f/mjkpvqed");
+  const [state, handleSubmitFormspree] = useForm("mjkpvqed");
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -49,7 +49,8 @@ const Contact = () => {
           description: "We'll get back to you soon via email.",
         });
         setForm({ name: "", email: "", subject: "", message: "" });
-      } else if (state.errors.length > 0) {
+      } else if (Array.isArray(state.errors) && state.errors.length > 0) {
+        // ✅ FIXED: safely check for array before reading .length
         toast({
           title: "❌ Error",
           description: "Please check your inputs and try again.",
@@ -75,7 +76,9 @@ const Contact = () => {
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">Get in Touch</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-6">
+              Get in Touch
+            </h1>
             <p className="text-xl text-muted-foreground">
               Have questions? We're here to help. Reach out to our support team.
             </p>
@@ -87,7 +90,9 @@ const Contact = () => {
                 <Mail className="h-6 w-6 text-primary" />
               </div>
               <h3 className="font-bold mb-2">Email Us</h3>
-              <p className="text-sm text-muted-foreground">support@abiaxe.com</p>
+              <p className="text-sm text-muted-foreground">
+                support@abiaxe.com
+              </p>
             </Card>
 
             <Card className="p-6 text-center hover:shadow-lg transition-all">
@@ -124,7 +129,9 @@ const Contact = () => {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Email</label>
+                  <label className="text-sm font-medium mb-2 block">
+                    Email
+                  </label>
                   <Input
                     name="email"
                     type="email"
@@ -141,7 +148,9 @@ const Contact = () => {
                 </div>
               </div>
               <div>
-                <label className="text-sm font-medium mb-2 block">Subject</label>
+                <label className="text-sm font-medium mb-2 block">
+                  Subject
+                </label>
                 <Input
                   name="subject"
                   value={form.subject}
@@ -151,7 +160,9 @@ const Contact = () => {
                 />
               </div>
               <div>
-                <label className="text-sm font-medium mb-2 block">Message</label>
+                <label className="text-sm font-medium mb-2 block">
+                  Message
+                </label>
                 <Textarea
                   name="message"
                   value={form.message}
