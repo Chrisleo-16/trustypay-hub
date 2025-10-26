@@ -723,7 +723,7 @@ const Index = () => {
                 <h3 className="text-2xl font-bold mb-6">Send us a message</h3>
 
                 <form
-                  ref={useRef}
+                  ref={formRef}
                   onSubmit={handleSubmit}
                   className="space-y-6"
                 >
