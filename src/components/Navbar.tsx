@@ -7,58 +7,88 @@ import { supabase } from "@/integrations/supabase/client";
 export const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
-  const [dashboardPath, setDashboardPath] = useState("/dashboard");
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [dashboardPath, setDashboardPath] = useState(
+    "https://abiaxe-wallet.vercel.app/"
+  );
+
+  // ✅ Helper: Fetch user role from user_roles table
+  const fetchUserRole = async (userId: string) => {
+    const { data, error } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .single();
+
+    if (error) {
+      console.warn("Error fetching user role:", error.message);
+      setUserRole(null);
+      setDashboardPath("https://abiaxe-wallet.vercel.app/");
+      return;
+    }
+
+    setUserRole(data?.role || null);
+    setDashboardPath(
+      data?.role === "admin" ? "/admin" : "https://abiaxe-wallet.vercel.app/"
+    );
+  };
 
   useEffect(() => {
-    const fetchUserAndRole = async () => {
-      // ✅ Get the logged-in user
-      const { data: userData } = await supabase.auth.getUser();
-      const user = userData?.user;
-      setUser(user);
+    // ✅ 1. Check if a session already exists (page refresh)
+    const init = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
 
-      if (user) {
-        // ✅ Fetch role from user_roles table instead of profiles
-        const { data: roleData, error } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", user.id)
-          .single();
-
-        if (!error && roleData) {
-          setDashboardPath(roleData.role === "admin" ? "/admin" : "/dashboard");
-        } else {
-          setDashboardPath("/dashboard");
-        }
+      if (session?.user) {
+        setUser(session.user);
+        await fetchUserRole(session.user.id);
+      } else {
+        setUser(null);
+        setUserRole(null);
+        setDashboardPath("https://abiaxe-wallet.vercel.app/");
       }
     };
 
-    fetchUserAndRole();
+    init();
 
-    // ✅ Listen for auth state changes
-    const { data: subscription } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        const user = session?.user;
-        setUser(user);
-
-        if (user) {
-          const { data: roleData, error } = await supabase
-            .from("user_roles")
-            .select("role")
-            .eq("user_id", user.id)
-            .single();
-
-          if (!error && roleData) {
-            setDashboardPath(roleData.role === "admin" ? "/admin" : "/dashboard");
-          } else {
-            setDashboardPath("/dashboard");
-          }
-        } else {
-          setDashboardPath("/dashboard");
-        }
+    // ✅ 2. Subscribe to auth state changes (login/logout)
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user) {
+        setUser(session.user);
+        await fetchUserRole(session.user.id);
+      } else {
+        setUser(null);
+        setUserRole(null);
+        setDashboardPath("https://abiaxe-wallet.vercel.app/");
       }
-    );
+    });
 
-    return () => subscription?.subscription.unsubscribe();
+    // ✅ 3. Optional: Realtime updates if role changes in DB
+    const roleSubscription = supabase
+      .channel("user_roles-updates")
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "user_roles" },
+        (payload) => {
+          if (payload.new.user_id === user?.id) {
+            setUserRole(payload.new.role);
+            setDashboardPath(
+              payload.new.role === "admin"
+                ? "/admin"
+                : "https://abiaxe-wallet.vercel.app/"
+            );
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+      supabase.removeChannel(roleSubscription);
+    };
   }, []);
 
   return (
@@ -75,18 +105,42 @@ export const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-6">
-            <Link to="/marketplace" className="text-sm font-medium text-foreground hover:text-primary transition-colors">
+            <Link
+              to="/marketplace"
+              className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+            >
               Marketplace
             </Link>
-            <Link to="/how-it-works" className="text-sm font-medium text-foreground hover:text-primary transition-colors">
+            <Link
+              to="/how-it-works"
+              className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+            >
               How It Works
             </Link>
-            <Link to="/about" className="text-sm font-medium text-foreground hover:text-primary transition-colors">
+            <Link
+              to="/about"
+              className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+            >
               About
             </Link>
-            <Link to="/contact" className="text-sm font-medium text-foreground hover:text-primary transition-colors">
+            <Link
+              to="/contact"
+              className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+            >
               Contact
             </Link>
+
+            {/* ✅ Wallet Link (visible only for logged-in users with "user" role)
+            {user && userRole === "user" && (
+              <a
+                href="https://abiaxe-wallet.vercel.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+              >
+                Wallet
+              </a>
+            )} */}
           </div>
 
           {/* Desktop Auth / Dashboard */}
@@ -100,7 +154,10 @@ export const Navbar = () => {
             ) : (
               <>
                 <Link to="/auth">
-                  <Button variant="ghost" className="text-primary border-2 border-primary hover:text-white">
+                  <Button
+                    variant="ghost"
+                    className="text-primary border-2 border-primary hover:text-white"
+                  >
                     Sign In
                   </Button>
                 </Link>
@@ -146,12 +203,35 @@ export const Navbar = () => {
             >
               About
             </Link>
+            <Link
+              to="/contact"
+              className="block py-2 text-sm font-medium text-foreground hover:text-primary transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Contact
+            </Link>
+
+            {/* ✅ Mobile Wallet Link
+            {user && userRole === "user" && (
+              <a
+                href="https://abiaxe-wallet.vercel.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block py-2 text-sm font-medium text-foreground hover:text-primary transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Wallet
+              </a>
+            )} */}
 
             <div className="flex flex-col gap-2 pt-2">
               {user ? (
-                <Link to={dashboardPath} onClick={() => setMobileMenuOpen(false)}>
+                <Link
+                  to={dashboardPath}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
                   <Button className="w-full bg-gradient-primary hover:opacity-90">
-                    Dashboard
+                    Wallet
                   </Button>
                 </Link>
               ) : (
@@ -161,7 +241,10 @@ export const Navbar = () => {
                       Sign In
                     </Button>
                   </Link>
-                  <Link to="/auth?mode=signup" onClick={() => setMobileMenuOpen(false)}>
+                  <Link
+                    to="/auth?mode=signup"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
                     <Button className="w-full bg-gradient-primary hover:opacity-90">
                       Get Started
                     </Button>
