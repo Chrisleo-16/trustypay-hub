@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Mail, MessageSquare, Phone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { useForm, ValidationError } from "@formspree/react"; // ✅ added
 
 interface ContactForm {
   name: string;
@@ -24,6 +25,9 @@ const Contact = () => {
     message: "",
   });
 
+  // ✅ Formspree setup
+  const [state, handleSubmitFormspree] = useForm("https://formspree.io/f/mjkpvqed");
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -31,36 +35,32 @@ const Contact = () => {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  // ✅ Modified handleSubmit to use Formspree instead of /api/sendEmail
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const res = await fetch("/api/sendEmail", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
+      await handleSubmitFormspree(e);
 
-      const data = await res.json();
-
-      if (data.success) {
+      if (state.succeeded) {
         toast({
           title: "✅ Message sent!",
           description: "We'll get back to you soon via email.",
         });
         setForm({ name: "", email: "", subject: "", message: "" });
-      } else {
+      } else if (state.errors.length > 0) {
         toast({
           title: "❌ Error",
-          description: data.message || "Failed to send message.",
+          description: "Please check your inputs and try again.",
           variant: "destructive",
         });
       }
     } catch (error: any) {
       toast({
         title: "❌ Failed to send",
-        description: error.message || "Please check your connection and try again.",
+        description:
+          error.message || "Please check your connection and try again.",
         variant: "destructive",
       });
     } finally {
@@ -109,6 +109,8 @@ const Contact = () => {
 
           <Card className="p-8">
             <h2 className="text-2xl font-bold mb-6">Send us a message</h2>
+
+            {/* ✅ Formspree-enabled form */}
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
@@ -130,6 +132,11 @@ const Contact = () => {
                     onChange={handleChange}
                     placeholder="your@email.com"
                     required
+                  />
+                  <ValidationError
+                    prefix="Email"
+                    field="email"
+                    errors={state.errors}
                   />
                 </div>
               </div>
@@ -153,14 +160,19 @@ const Contact = () => {
                   rows={6}
                   required
                 />
+                <ValidationError
+                  prefix="Message"
+                  field="message"
+                  errors={state.errors}
+                />
               </div>
               <Button
                 type="submit"
                 size="lg"
                 className="w-full bg-primary hover:bg-primary-hover"
-                disabled={loading}
+                disabled={loading || state.submitting}
               >
-                {loading ? "Sending..." : "Send Message"}
+                {loading || state.submitting ? "Sending..." : "Send Message"}
               </Button>
             </form>
           </Card>
