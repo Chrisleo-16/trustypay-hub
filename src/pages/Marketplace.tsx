@@ -41,7 +41,7 @@ const P2PMarket = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedAd, setSelectedAd] = useState<Ad | null>(null);
   const [amount, setAmount] = useState("");
-  const [countdown, setCountdown] = useState(900); // 15 minutes in seconds
+  const [countdown, setCountdown] = useState(27000); // 15 minutes in seconds
   const [orderDetails, setOrderDetails] = useState<any>(null);
 
   // Mock ads data
