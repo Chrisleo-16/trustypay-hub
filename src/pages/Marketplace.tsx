@@ -41,7 +41,7 @@ const P2PMarket = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedAd, setSelectedAd] = useState<Ad | null>(null);
   const [amount, setAmount] = useState("");
-  const [countdown, setCountdown] = useState(27000); // 15 minutes in seconds
+  const [countdown, setCountdown] = useState(9000); // 15 minutes in seconds
   const [orderDetails, setOrderDetails] = useState<any>(null);
 
   // Mock ads data
@@ -150,7 +150,7 @@ const P2PMarket = () => {
         title: activeTab === 'buy' ? "Funds Transferred!" : "Payment Received!",
         description: "Please confirm to continue.",
       });
-    }, 900000);
+    }, 9000);
 
     // Start countdown if selling
     if (activeTab === 'sell') {
@@ -162,7 +162,7 @@ const P2PMarket = () => {
           }
           return prev - 1;
         });
-      }, 900000);
+      }, 9000);
     }
   };
 
@@ -177,8 +177,8 @@ const P2PMarket = () => {
       setShowModal(false);
       setOrderStage('listing');
       setAmount("");
-      setCountdown(27000);
-    }, 900000);
+      setCountdown(9000);
+    }, 9000);
   };
 
   const formatTime = (seconds: number) => {
