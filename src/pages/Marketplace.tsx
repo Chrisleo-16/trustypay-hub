@@ -153,7 +153,7 @@ const P2PMarket = () => {
     });
 
     setOrderStage('waiting');
-    setCountdown(300); // Start at 5 minutes for waiting stage
+    setCountdown(350); // Start at 5 minutes for waiting stage
 
     toast({
       title: "Order Placed!",
@@ -161,7 +161,7 @@ const P2PMarket = () => {
     });
 
     // Simulate seller confirmation after 2–5 minutes
-    const confirmDelay = Math.floor(Math.random() * (300 - 120 + 1)) + 120; // random between 120–300 sec
+    const confirmDelay = Math.floor(Math.random() * (350 - 120 + 1)) + 120; // random between 120–300 sec
     setTimeout(() => {
       setOrderStage('confirming');
       setCountdown(900); // Reset timer for release stage (15 minutes)
