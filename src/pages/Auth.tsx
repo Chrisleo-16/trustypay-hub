@@ -8,7 +8,8 @@ import { ShieldCheck, X } from "lucide-react";
 import { FaGoogle, FaApple } from "react-icons/fa";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import cryptoImage from "@/assets/wallpaper-crypto-theme-high-quality-photo-382426897.webp"
+import cryptoImage from "@/assets/wallpaper-crypto-theme-high-quality-photo-382426897.webp";
+import { ArrowBigRightIcon } from "lucide-react";
 
 export default function AuthGlassModal() {
   const navigate = useNavigate();
@@ -26,18 +27,19 @@ export default function AuthGlassModal() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Redirect if already logged in
     const check = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      const { data } = await supabase.auth.getSession();
+      const session = data.session;
       if (session?.user) {
         const { data: roleData } = await supabase
           .from("user_roles")
           .select("role")
           .eq("user_id", session.user.id)
           .maybeSingle();
-        navigate(roleData?.role === "admin" ? "/admin" : "/", { replace: true });
+
+        navigate(roleData?.role === "admin" ? "/admin" : "/", {
+          replace: true,
+        });
       }
     };
     check();
@@ -54,22 +56,20 @@ export default function AuthGlassModal() {
           return;
         }
 
-        const { error, data } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
-          options: { data: { full_name: `${firstName} ${lastName}` } },
+          options: { data: { full_name: `${firstName} ${lastName}`, phone } },
         });
 
         if (error) throw error;
 
-        // Assign correct role
         if (data?.user) {
           const roleToAssign =
-            email.toLowerCase() === "admin@secureswap.com" ? "admin" : "user";
-
-          await supabase.from("user_roles").insert([
-            { user_id: data.user.id, role: roleToAssign },
-          ]);
+            email.toLowerCase() === "admin@abiaxe.com" ? "admin" : "user";
+          await supabase
+            .from("user_roles")
+            .insert([{ user_id: data.user.id, role: roleToAssign }]);
         }
 
         toast({
@@ -96,9 +96,20 @@ export default function AuthGlassModal() {
           throw error;
         }
 
-        const user = data?.user;
-        if (!user) throw new Error("User not found after login");
+        const session = data.session;
+        const user = data.user;
+        if (!session || !user) throw new Error("User not found after login");
 
+        // ✅ Save Supabase access token for future authenticated API calls
+        localStorage.setItem(
+          "walletAuth",
+          JSON.stringify({
+            email: user.email,
+            token: session.access_token,
+          })
+        );
+
+        // Get user role
         const { data: roleData } = await supabase
           .from("user_roles")
           .select("role")
@@ -150,7 +161,7 @@ export default function AuthGlassModal() {
           <X className="w-5 h-5 text-white" />
         </button>
 
-        <Card className="mx-auto overflow-hidden rounded-2xl bg-gradient-to-br from-black/50 to-black/80  border border-white/10 shadow-2xl bg-[rgba(0,0,0,0.35)] ">
+        <Card className="mx-auto overflow-hidden rounded-2xl bg-gradient-to-br from-black/50 to-black/80 border border-white/10 shadow-2xl bg-[rgba(0,0,0,0.35)]">
           <div className="p-6 md:p-8 lg:p-10">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
@@ -194,7 +205,7 @@ export default function AuthGlassModal() {
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
                       placeholder="John"
-                      className="bg-[rgba(0,0,0,0.35)]  text-white placeholder:text-white/40 border border-white/5"
+                      className="bg-[rgba(0,0,0,0.35)] text-white placeholder:text-white/40 border border-white/5"
                       required
                     />
                   </div>
@@ -204,7 +215,7 @@ export default function AuthGlassModal() {
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
                       placeholder="Doe"
-                      className="bg-[rgba(0,0,0,0.35)]  text-white placeholder:text-white/40 border border-white/5"
+                      className="bg-[rgba(0,0,0,0.35)] text-white placeholder:text-white/40 border border-white/5"
                       required
                     />
                   </div>
@@ -219,7 +230,7 @@ export default function AuthGlassModal() {
                   onChange={(e) => setEmail(e.target.value)}
                   type="email"
                   placeholder="Enter your email"
-                  className="bg-[rgba(0,0,0,0.35)]  text-white placeholder:text-white/40 border border-white/5"
+                  className="bg-[rgba(0,0,0,0.35)] text-white placeholder:text-white/40 border border-white/5"
                   required
                 />
               </div>
@@ -231,7 +242,7 @@ export default function AuthGlassModal() {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="(775) 351-6501"
-                    className="bg-[rgba(0,0,0,0.35)]  text-white placeholder:text-white/40 border border-white/5"
+                    className="bg-[rgba(0,0,0,0.35)] text-white placeholder:text-white/40 border border-white/5"
                   />
                 </div>
               )}
@@ -244,7 +255,7 @@ export default function AuthGlassModal() {
                   onChange={(e) => setPassword(e.target.value)}
                   type="password"
                   placeholder="••••••••"
-                  className="bg-[rgba(0,0,0,0.35)]  text-white placeholder:text-white/40 border border-white/5"
+                  className="bg-[rgba(0,0,0,0.35)] text-white placeholder:text-white/40 border border-white/5"
                   required
                 />
               </div>
@@ -258,7 +269,7 @@ export default function AuthGlassModal() {
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     type="password"
                     placeholder="••••••••"
-                    className="bg-[rgba(0,0,0,0.35)]  text-white placeholder:text-white/40 border border-white/5"
+                    className="bg-[rgba(0,0,0,0.35)] text-white placeholder:text-white/40 border border-white/5"
                     required
                   />
                 </div>
@@ -270,12 +281,18 @@ export default function AuthGlassModal() {
                   className="w-full bg-white text-black font-semibold py-3 rounded-lg shadow-md"
                   disabled={loading}
                 >
-                  {loading ? "Please wait..." : isSignUp ? "Create an account" : "Sign in"}
+                  {loading
+                    ? "Please wait..."
+                    : isSignUp
+                      ? "Create an account"
+                      : "Sign in"}
                 </Button>
               </div>
             </form>
 
-            <div className="my-4 text-center text-white/60">OR SIGN IN WITH</div>
+            <div className="my-4 text-center text-white/60">
+              OR SIGN IN WITH
+            </div>
 
             <div className="flex gap-3">
               <button
@@ -298,6 +315,13 @@ export default function AuthGlassModal() {
             <p className="mt-4 text-center text-xs text-white/60">
               By creating an account, you agree to our Terms & Service
             </p>
+            <Link
+              to={"/"}
+              className="text-decoration-none text-white z-12 p-2 ml-4 flex"
+            >
+              <ArrowBigRightIcon />
+              Back Home
+            </Link>
           </div>
         </Card>
       </div>

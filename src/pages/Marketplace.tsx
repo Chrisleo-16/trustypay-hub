@@ -23,12 +23,11 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
-// ✅ Define main order and trade types
 type OrderStage = "listing" | "placing" | "waiting" | "confirming" | "success";
 type TradeType = "buy" | "sell";
 
-// ✅ Define the shape expected by your frontend
 interface Ad {
   id: string;
   user: string;
@@ -43,8 +42,43 @@ interface Ad {
   type: "buy" | "sell";
 }
 
+const WalletEmbed = ({
+  userEmail,
+  authToken,
+}: {
+  userEmail: string;
+  authToken: string;
+}) => {
+  const [walletUrl, setWalletUrl] = useState("");
+
+  useEffect(() => {
+    if (userEmail && authToken) {
+      const baseUrl = "https://abiaxe-wallet.vercel.app";
+      const url = `${baseUrl}?email=${encodeURIComponent(
+        userEmail
+      )}&token=${encodeURIComponent(authToken)}`;
+      setWalletUrl(url);
+    }
+  }, [userEmail, authToken]);
+
+  if (!walletUrl) return null;
+
+  return (
+    <div className="wallet-container mb-8">
+      <iframe
+        src={walletUrl}
+        className="w-full h-[600px] border-0 rounded-xl shadow-lg"
+        title="Abiaxe Wallet"
+        allow="payment"
+      />
+    </div>
+  );
+};
+
 const P2PMarket = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
+
   const [activeTab, setActiveTab] = useState<TradeType>("buy");
   const [orderStage, setOrderStage] = useState<OrderStage>("listing");
   const [showModal, setShowModal] = useState(false);
@@ -54,28 +88,65 @@ const P2PMarket = () => {
   const [orderDetails, setOrderDetails] = useState<any>(null);
   const [ads, setAds] = useState<Ad[]>([]);
   const [loadingAds, setLoadingAds] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [authToken, setAuthToken] = useState<string | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // ✅ Fetch and map Supabase ads to your Ad interface
+  // ✅ Load wallet credentials
+  useEffect(() => {
+    const storedWalletAuth = localStorage.getItem("walletAuth");
+    if (storedWalletAuth) {
+      const parsed = JSON.parse(storedWalletAuth);
+      setUserEmail(parsed.email);
+      setAuthToken(parsed.token);
+    } else {
+      toast({
+        title: "Login Required",
+        description: "Please log in to access your wallet and start trading.",
+        variant: "destructive",
+      });
+      navigate("/auth?mode=signin");
+    }
+  }, [navigate, toast]);
+
+  // ✅ Fetch ads joined with currency names
   useEffect(() => {
     const fetchAds = async () => {
       try {
         setLoadingAds(true);
-        const { data, error } = await supabase.from("ads").select("*");
+
+        const { data, error } = await supabase.from("ads").select(
+          `
+            id,
+            user_id,
+            order_type,
+            price,
+            min_amount,
+            max_amount,
+            payment_methods,
+            available_amount,
+            status,
+            created_at,
+            currencies (
+              name,
+              symbol
+            )
+          `
+        );
+
         if (error) throw error;
 
-        // ✅ Map DB structure to your frontend-friendly format
         const mappedAds: Ad[] = (data ?? []).map((ad: any) => ({
           id: ad.id,
           user: ad.user_id || "Anonymous",
-          verified: ad.verified ?? false,
-          currency: ad.currency_id || "USD",
-          price: ad.price,
+          verified: false,
+          currency: ad.currencies?.name || "Unknown",
+          price: parseFloat(ad.price),
           paymentMethods: ad.payment_methods || [],
-          minAmount: ad.min_amount,
-          maxAmount: ad.max_amount,
-          rating: ad.rating ?? 5,
-          trades: ad.trades ?? 0,
+          minAmount: parseFloat(ad.min_amount),
+          maxAmount: parseFloat(ad.max_amount),
+          rating: 5,
+          trades: 0,
           type: ad.order_type,
         }));
 
@@ -110,22 +181,19 @@ const P2PMarket = () => {
     };
   }, [orderStage]);
 
-  // ✅ Format time helper
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+    return `${mins.toString().padStart(2, "0")}:${secs
+      .toString()
+      .padStart(2, "0")}`;
   };
 
-  // ✅ Wallet check (only checks funds)
   const checkWalletBalance = async (amount: number): Promise<boolean> => {
     try {
-      const response = await fetch(
-        "https://abiaxe-wallet.vercel.app/api/wallet/balance",
-        {
-          credentials: "include",
-        }
-      );
+      const response = await fetch("https://abiaxe-wallet.vercel.app/wallet", {
+        credentials: "include",
+      });
       if (!response.ok) throw new Error("Failed to check wallet balance");
 
       const data = await response.json();
@@ -142,7 +210,6 @@ const P2PMarket = () => {
     }
   };
 
-  // ✅ Handlers
   const handleOpenOrder = (ad: Ad, type: TradeType) => {
     setSelectedAd(ad);
     setActiveTab(type);
@@ -213,7 +280,6 @@ const P2PMarket = () => {
     }, releaseDelay * 1000);
   };
 
-  // ✅ Ad Card
   const AdCard = ({ ad, type }: { ad: Ad; type: TradeType }) => (
     <Card className="hover:shadow-lg transition-all duration-300 border-2">
       <CardContent className="p-6">
@@ -272,11 +338,15 @@ const P2PMarket = () => {
     </Card>
   );
 
-  // ✅ Render Page
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="container mx-auto px-4 py-8">
+        {/* ✅ Wallet now uses logged-in credentials */}
+        {userEmail && authToken && (
+          <WalletEmbed userEmail={userEmail} authToken={authToken} />
+        )}
+
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-2 flex items-center gap-3">
             <TrendingUp className="w-8 h-8 text-primary" />
