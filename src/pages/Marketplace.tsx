@@ -3,26 +3,34 @@ import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { 
-  CheckCircle2, 
-  Shield, 
-  Clock, 
+import {
+  CheckCircle2,
+  Shield,
+  Clock,
   DollarSign,
   Loader2,
   AlertCircle,
-  TrendingUp
+  TrendingUp,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
-type OrderStage = 'listing' | 'placing' | 'waiting' | 'confirming' | 'success';
-type TradeType = 'buy' | 'sell';
+// ✅ Define main order and trade types
+type OrderStage = "listing" | "placing" | "waiting" | "confirming" | "success";
+type TradeType = "buy" | "sell";
 
+// ✅ Define the shape expected by your frontend
 interface Ad {
-  id: number;
+  id: string;
   user: string;
   verified: boolean;
   currency: string;
@@ -32,27 +40,69 @@ interface Ad {
   maxAmount: number;
   rating: number;
   trades: number;
+  type: "buy" | "sell";
 }
 
 const P2PMarket = () => {
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState<TradeType>('buy');
-  const [orderStage, setOrderStage] = useState<OrderStage>('listing');
+  const [activeTab, setActiveTab] = useState<TradeType>("buy");
+  const [orderStage, setOrderStage] = useState<OrderStage>("listing");
   const [showModal, setShowModal] = useState(false);
   const [selectedAd, setSelectedAd] = useState<Ad | null>(null);
   const [amount, setAmount] = useState("");
-  const [countdown, setCountdown] = useState(900); // 15 minutes in seconds
+  const [countdown, setCountdown] = useState(900);
   const [orderDetails, setOrderDetails] = useState<any>(null);
-
+  const [ads, setAds] = useState<Ad[]>([]);
+  const [loadingAds, setLoadingAds] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // ✅ Fetch and map Supabase ads to your Ad interface
+  useEffect(() => {
+    const fetchAds = async () => {
+      try {
+        setLoadingAds(true);
+        const { data, error } = await supabase.from("ads").select("*");
+        if (error) throw error;
+
+        // ✅ Map DB structure to your frontend-friendly format
+        const mappedAds: Ad[] = (data ?? []).map((ad: any) => ({
+          id: ad.id,
+          user: ad.user_id || "Anonymous",
+          verified: ad.verified ?? false,
+          currency: ad.currency_id || "USD",
+          price: ad.price,
+          paymentMethods: ad.payment_methods || [],
+          minAmount: ad.min_amount,
+          maxAmount: ad.max_amount,
+          rating: ad.rating ?? 5,
+          trades: ad.trades ?? 0,
+          type: ad.order_type,
+        }));
+
+        setAds(mappedAds);
+      } catch (error) {
+        console.error("Error fetching ads:", error);
+        toast({
+          title: "Error loading ads",
+          description: "Please try again later.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoadingAds(false);
+      }
+    };
+
+    fetchAds();
+  }, [toast]);
+
+  // ✅ Countdown timer
   useEffect(() => {
     if (orderStage === "waiting" || orderStage === "confirming") {
       timerRef.current = setInterval(() => {
         setCountdown((prev) => (prev > 0 ? prev - 1 : 0));
       }, 1000);
-    } else {
-      if (timerRef.current) clearInterval(timerRef.current);
+    } else if (timerRef.current) {
+      clearInterval(timerRef.current);
     }
 
     return () => {
@@ -60,86 +110,62 @@ const P2PMarket = () => {
     };
   }, [orderStage]);
 
-  // Mock ads data
-  const sellAds: Ad[] = [
-    {
-      id: 1,
-      user: "CryptoKing99",
-      verified: true,
-      currency: "USDT",
-      price: 1.02,
-      paymentMethods: ["Bank Transfer", "PayPal"],
-      minAmount: 50,
-      maxAmount: 5000,
-      rating: 4.9,
-      trades: 1250
-    },
-    {
-      id: 2,
-      user: "BitMaster",
-      verified: true,
-      currency: "BTC",
-      price: 43250,
-      paymentMethods: ["Bank Transfer", "Wise"],
-      minAmount: 100,
-      maxAmount: 10000,
-      rating: 4.8,
-      trades: 890
-    },
-    {
-      id: 3,
-      user: "EthTrader",
-      verified: true,
-      currency: "ETH",
-      price: 2280,
-      paymentMethods: ["PayPal", "Venmo"],
-      minAmount: 200,
-      maxAmount: 8000,
-      rating: 4.7,
-      trades: 567
-    },
-  ];
+  // ✅ Format time helper
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  };
 
-  const buyAds: Ad[] = [
-    {
-      id: 4,
-      user: "WhaleInvestor",
-      verified: true,
-      currency: "USDT",
-      price: 0.98,
-      paymentMethods: ["Bank Transfer"],
-      minAmount: 100,
-      maxAmount: 20000,
-      rating: 5.0,
-      trades: 2100
-    },
-    {
-      id: 5,
-      user: "CryptoCollector",
-      verified: true,
-      currency: "BNB",
-      price: 315,
-      paymentMethods: ["Bank Transfer", "Zelle"],
-      minAmount: 50,
-      maxAmount: 5000,
-      rating: 4.9,
-      trades: 1450
-    },
-  ];
+  // ✅ Wallet check (only checks funds)
+  const checkWalletBalance = async (amount: number): Promise<boolean> => {
+    try {
+      const response = await fetch(
+        "https://abiaxe-wallet.vercel.app/api/wallet/balance",
+        {
+          credentials: "include",
+        }
+      );
+      if (!response.ok) throw new Error("Failed to check wallet balance");
 
+      const data = await response.json();
+      const balance = parseFloat(data?.balance || "0");
+      return balance >= amount;
+    } catch (error) {
+      console.error("Wallet check error:", error);
+      toast({
+        title: "Wallet Error",
+        description: "Unable to verify wallet balance. Please try again.",
+        variant: "destructive",
+      });
+      return false;
+    }
+  };
+
+  // ✅ Handlers
   const handleOpenOrder = (ad: Ad, type: TradeType) => {
     setSelectedAd(ad);
     setActiveTab(type);
     setShowModal(true);
-    setOrderStage('placing');
+    setOrderStage("placing");
   };
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     if (!amount || parseFloat(amount) < (selectedAd?.minAmount || 0)) {
       toast({
         title: "Invalid Amount",
         description: `Minimum amount is $${selectedAd?.minAmount}`,
-        variant: "destructive"
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const enoughFunds = await checkWalletBalance(parseFloat(amount));
+    if (!enoughFunds) {
+      toast({
+        title: "Insufficient Balance",
+        description: "You don’t have enough funds in your wallet.",
+        variant: "destructive",
       });
       return;
     }
@@ -149,52 +175,45 @@ const P2PMarket = () => {
       price: selectedAd?.price,
       currency: selectedAd?.currency,
       paymentMethod: selectedAd?.paymentMethods[0],
-      user: selectedAd?.user
+      user: selectedAd?.user,
     });
 
-    setOrderStage('waiting');
-    setCountdown(350); // Start at 5 minutes for waiting stage
+    setOrderStage("waiting");
+    setCountdown(350);
 
     toast({
       title: "Order Placed!",
       description: "Waiting for the other party to confirm.",
     });
 
-    // Simulate seller confirmation after 2–5 minutes
-    const confirmDelay = Math.floor(Math.random() * (350 - 120 + 1)) + 120; // random between 120–300 sec
+    const confirmDelay = Math.floor(Math.random() * (350 - 120 + 1)) + 120;
     setTimeout(() => {
-      setOrderStage('confirming');
-      setCountdown(900); // Reset timer for release stage (15 minutes)
+      setOrderStage("confirming");
+      setCountdown(900);
       toast({
-        title: activeTab === 'buy' ? "Funds Transferred!" : "Payment Received!",
+        title: activeTab === "buy" ? "Funds Transferred!" : "Payment Received!",
         description: "Please confirm to continue.",
       });
     }, confirmDelay * 1000);
   };
 
   const handleConfirmReceipt = () => {
-    setOrderStage('success');
+    setOrderStage("success");
     toast({
       title: "Success!",
       description: "Assets released successfully.",
     });
 
-    // Simulate release confirmation after 10–15 minutes
-    const releaseDelay = Math.floor(Math.random() * (900 - 600 + 1)) + 600; // 600–900 seconds
+    const releaseDelay = Math.floor(Math.random() * (900 - 600 + 1)) + 600;
     setTimeout(() => {
       setShowModal(false);
-      setOrderStage('listing');
+      setOrderStage("listing");
       setAmount("");
       setCountdown(900);
     }, releaseDelay * 1000);
   };
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
-
+  // ✅ Ad Card
   const AdCard = ({ ad, type }: { ad: Ad; type: TradeType }) => (
     <Card className="hover:shadow-lg transition-all duration-300 border-2">
       <CardContent className="p-6">
@@ -242,21 +261,21 @@ const P2PMarket = () => {
           </div>
         </div>
 
-        <Button 
-          className="w-full" 
+        <Button
+          className="w-full"
           onClick={() => handleOpenOrder(ad, type)}
-          variant={type === 'buy' ? 'default' : 'accent'}
+          variant={type === "buy" ? "default" : "accent"}
         >
-          {type === 'buy' ? 'Buy' : 'Sell'} {ad.currency}
+          {type === "buy" ? "Buy" : "Sell"} {ad.currency}
         </Button>
       </CardContent>
     </Card>
   );
 
+  // ✅ Render Page
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-2 flex items-center gap-3">
@@ -268,45 +287,68 @@ const P2PMarket = () => {
           </p>
         </div>
 
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TradeType)} className="w-full">
+        <Tabs
+          value={activeTab}
+          onValueChange={(v) => setActiveTab(v as TradeType)}
+          className="w-full"
+        >
           <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
-            <TabsTrigger value="buy" className="text-lg">Buy Crypto</TabsTrigger>
-            <TabsTrigger value="sell" className="text-lg">Sell Crypto</TabsTrigger>
+            <TabsTrigger value="buy" className="text-lg">
+              Buy Crypto
+            </TabsTrigger>
+            <TabsTrigger value="sell" className="text-lg">
+              Sell Crypto
+            </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="buy" className="mt-0 animate-fade-in">
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {sellAds.map((ad) => (
-                <AdCard key={ad.id} ad={ad} type="buy" />
-              ))}
+          {loadingAds ? (
+            <div className="text-center py-20">
+              <Loader2 className="w-10 h-10 animate-spin mx-auto mb-4 text-primary" />
+              <p className="text-muted-foreground">Loading ads...</p>
             </div>
-          </TabsContent>
+          ) : (
+            <>
+              <TabsContent value="buy">
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {ads
+                    .filter((ad) => ad.type === "sell")
+                    .map((ad) => (
+                      <AdCard key={ad.id} ad={ad} type="buy" />
+                    ))}
+                </div>
+              </TabsContent>
 
-          <TabsContent value="sell" className="mt-0 animate-fade-in">
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {buyAds.map((ad) => (
-                <AdCard key={ad.id} ad={ad} type="sell" />
-              ))}
-            </div>
-          </TabsContent>
+              <TabsContent value="sell">
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {ads
+                    .filter((ad) => ad.type === "buy")
+                    .map((ad) => (
+                      <AdCard key={ad.id} ad={ad} type="sell" />
+                    ))}
+                </div>
+              </TabsContent>
+            </>
+          )}
         </Tabs>
       </div>
 
       {/* ✅ Your Modal remains completely intact */}
       <Dialog open={showModal} onOpenChange={setShowModal}>
         <DialogContent className="sm:max-w-md">
-          {orderStage === 'placing' && (
+          {orderStage === "placing" && (
             <>
               <DialogHeader>
                 <DialogTitle>
-                  {activeTab === 'buy' ? 'Buy' : 'Sell'} {selectedAd?.currency}
+                  {activeTab === "buy" ? "Buy" : "Sell"} {selectedAd?.currency}
                 </DialogTitle>
               </DialogHeader>
-              
+
               <div className="space-y-4 py-4">
                 <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
                   <span className="text-muted-foreground">Price</span>
-                  <span className="text-xl font-bold">${selectedAd?.price}</span>
+                  <span className="text-xl font-bold">
+                    ${selectedAd?.price}
+                  </span>
                 </div>
 
                 <div className="space-y-2">
@@ -328,10 +370,10 @@ const P2PMarket = () => {
                   <div className="flex justify-between">
                     <span>You will receive</span>
                     <span className="font-bold">
-                      {amount && selectedAd?.price 
+                      {amount && selectedAd?.price
                         ? (parseFloat(amount) / selectedAd.price).toFixed(4)
-                        : '0.0000'
-                      } {selectedAd?.currency}
+                        : "0.0000"}{" "}
+                      {selectedAd?.currency}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm text-muted-foreground">
@@ -340,8 +382,8 @@ const P2PMarket = () => {
                   </div>
                 </div>
 
-                <Button 
-                  className="w-full" 
+                <Button
+                  className="w-full"
                   size="lg"
                   onClick={handlePlaceOrder}
                   disabled={!amount}
@@ -352,7 +394,7 @@ const P2PMarket = () => {
             </>
           )}
 
-          {orderStage === 'waiting' && (
+          {orderStage === "waiting" && (
             <div className="py-8 text-center space-y-6">
               <div className="flex justify-center">
                 <div className="relative">
@@ -363,17 +405,16 @@ const P2PMarket = () => {
 
               <div>
                 <h3 className="text-xl font-bold mb-2">
-                  Waiting for {activeTab === 'buy' ? 'Seller' : 'Buyer'}...
+                  Waiting for {activeTab === "buy" ? "Seller" : "Buyer"}...
                 </h3>
                 <p className="text-muted-foreground">
-                  {activeTab === 'buy' 
-                    ? 'Waiting for seller to transfer funds' 
-                    : 'Waiting for buyer to transfer payment'
-                  }
+                  {activeTab === "buy"
+                    ? "Waiting for seller to transfer funds"
+                    : "Waiting for buyer to transfer payment"}
                 </p>
               </div>
 
-              {activeTab === 'sell' && (
+              {activeTab === "sell" && (
                 <div className="inline-flex items-center gap-2 px-6 py-3 bg-primary/10 rounded-full">
                   <Clock className="w-5 h-5 text-primary" />
                   <span className="text-2xl font-mono font-bold text-primary">
@@ -393,13 +434,15 @@ const P2PMarket = () => {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Payment</span>
-                  <span className="font-medium">{orderDetails?.paymentMethod}</span>
+                  <span className="font-medium">
+                    {orderDetails?.paymentMethod}
+                  </span>
                 </div>
               </Card>
             </div>
           )}
 
-          {orderStage === 'confirming' && (
+          {orderStage === "confirming" && (
             <div className="py-8 text-center space-y-6">
               <div className="flex justify-center">
                 <div className="w-16 h-16 rounded-full bg-success/20 flex items-center justify-center">
@@ -409,22 +452,31 @@ const P2PMarket = () => {
 
               <div>
                 <h3 className="text-xl font-bold mb-2">
-                  {activeTab === 'buy' ? 'Funds Received!' : 'Payment Confirmed!'}
+                  {activeTab === "buy"
+                    ? "Funds Received!"
+                    : "Payment Confirmed!"}
                 </h3>
                 <p className="text-muted-foreground">
-                  Confirm you have received {activeTab === 'buy' ? 'the funds' : 'payment'} before releasing assets
+                  Confirm you have received{" "}
+                  {activeTab === "buy" ? "the funds" : "payment"} before
+                  releasing assets
                 </p>
               </div>
 
               <div className="flex items-start gap-3 p-4 bg-warning/10 rounded-lg border-2 border-warning/20">
                 <AlertCircle className="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />
                 <p className="text-sm text-left">
-                  <strong>Important:</strong> Only click "Release Assets" after verifying {activeTab === 'buy' ? 'the funds are in your account' : 'you received the payment'}.
+                  <strong>Important:</strong> Only click "Release Assets" after
+                  verifying{" "}
+                  {activeTab === "buy"
+                    ? "the funds are in your account"
+                    : "you received the payment"}
+                  .
                 </p>
               </div>
 
-              <Button 
-                className="w-full" 
+              <Button
+                className="w-full"
                 size="lg"
                 onClick={handleConfirmReceipt}
               >
@@ -434,7 +486,7 @@ const P2PMarket = () => {
             </div>
           )}
 
-          {orderStage === 'success' && (
+          {orderStage === "success" && (
             <div className="py-12 text-center space-y-6 animate-scale-in">
               <div className="flex justify-center">
                 <div className="w-20 h-20 rounded-full bg-success/20 flex items-center justify-center animate-pulse">
