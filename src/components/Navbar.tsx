@@ -1,6 +1,6 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck, Menu } from "lucide-react";
+import { ShieldCheck, Menu, LogOut } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -11,6 +11,7 @@ export const Navbar = () => {
   const [dashboardPath, setDashboardPath] = useState(
     "https://abiaxe-wallet.vercel.app/"
   );
+  const navigate = useNavigate();
 
   // ✅ Helper: Fetch user role from user_roles table
   const fetchUserRole = async (userId: string) => {
@@ -91,6 +92,20 @@ export const Navbar = () => {
     };
   }, []);
 
+  // ✅ Logout logic
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut(); // Sign out from Supabase
+      localStorage.clear(); // Clear all stored data
+      setUser(null);
+      setUserRole(null);
+      setDashboardPath("https://abiaxe-wallet.vercel.app/");
+      navigate("/"); // Redirect to Auth page
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
+
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
       <div className="container mx-auto px-4">
@@ -129,28 +144,27 @@ export const Navbar = () => {
             >
               Contact
             </Link>
-
-            {/* ✅ Wallet Link (visible only for logged-in users with "user" role)
-            {user && userRole === "user" && (
-              <a
-                href="https://abiaxe-wallet.vercel.app/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm font-medium text-foreground hover:text-primary transition-colors"
-              >
-                Wallet
-              </a>
-            )} */}
           </div>
 
-          {/* Desktop Auth / Dashboard */}
+          {/* Desktop Auth / Dashboard + Logout */}
           <div className="hidden md:flex items-center gap-3">
             {user ? (
-              <Link to={dashboardPath}>
-                <Button className="bg-primary hover:bg-primary-hover">
-                  Dashboard
-                </Button>
-              </Link>
+              <>
+                <Link to={dashboardPath}>
+                  <Button className="bg-primary hover:bg-primary-hover transition-all duration-300 transform hover:scale-[1.03]">
+                    Dashboard
+                  </Button>
+                </Link>
+
+                {/* ✅ Logout Link */}
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 text-sm font-medium text-red-500 hover:text-red-600 transition-all duration-300 transform hover:scale-105 group"
+                >
+                  <LogOut className="w-4 h-4 transition-transform duration-300 group-hover:-translate-x-1" />
+                  <span>Logout</span>
+                </button>
+              </>
             ) : (
               <>
                 <Link to="/auth">
@@ -211,29 +225,30 @@ export const Navbar = () => {
               Contact
             </Link>
 
-            {/* ✅ Mobile Wallet Link
-            {user && userRole === "user" && (
-              <a
-                href="https://abiaxe-wallet.vercel.app/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block py-2 text-sm font-medium text-foreground hover:text-primary transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Wallet
-              </a>
-            )} */}
-
             <div className="flex flex-col gap-2 pt-2">
               {user ? (
-                <Link
-                  to={dashboardPath}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <Button className="w-full bg-gradient-primary hover:opacity-90">
-                    Wallet
-                  </Button>
-                </Link>
+                <>
+                  <Link
+                    to={dashboardPath}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Button className="w-full bg-gradient-primary hover:opacity-90">
+                      Wallet
+                    </Button>
+                  </Link>
+
+                  {/* ✅ Mobile Logout */}
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="flex justify-center items-center gap-2 w-full py-3 text-sm font-medium text-red-500 hover:text-red-600 transition-all duration-300 transform hover:scale-105"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Logout
+                  </button>
+                </>
               ) : (
                 <>
                   <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>
